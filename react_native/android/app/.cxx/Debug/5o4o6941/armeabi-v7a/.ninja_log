@@ -1,0 +1,16 @@
+# ninja log v5
+11	111	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/armeabi-v7a/CMakeFiles/cmake.verify_globs	2dc8c39ed0a52aef
+2	24354	8148775758906406	CMakeFiles/appmodules.dir/OnLoad.cpp.o	f565b47da8fc64e3
+48	27902	8148775794838578	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7dee8f662dfc9525e795060fc15a9d46/safeareacontext/RNCSafeAreaViewState.cpp.o	3a0f76daf40c04c9
+80	31329	8148775828827020	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7462b4d0fad7b61077b82c38757c59ff/renderer/components/safeareacontext/Props.cpp.o	7a115c6a8aec5591
+64	35220	8148775867139304	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/8a096638b44ada4bca620dff2876a9b7/safeareacontext/ComponentDescriptors.cpp.o	27aa2adfa03e8d2
+29	40584	8148775921661957	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7dee8f662dfc9525e795060fc15a9d46/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o	5bf8211a720be8f0
+13	41468	8148775930142000	CMakeFiles/appmodules.dir/C_/Users/user/Desktop/Splitify/react_native/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	31391499353329f
+27909	43428	8148775950678906	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7462b4d0fad7b61077b82c38757c59ff/renderer/components/safeareacontext/States.cpp.o	48e8534ccd821f84
+24431	43626	8148775952058895	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/177f9e84ea320733ac6f40f569bcd0e6/components/safeareacontext/EventEmitters.cpp.o	dc09c343a16bab88
+35222	49495	8148776011638889	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/80ceb262e95b8784e2934f466b07b4bd/codegen/jni/safeareacontext-generated.cpp.o	5dd20007cc1ed62c
+31494	51252	8148776029348833	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/177f9e84ea320733ac6f40f569bcd0e6/components/safeareacontext/ShadowNodes.cpp.o	13272a3509b97d1c
+51254	51613	8148776033098903	C:/Users/user/Desktop/Splitify/react_native/android/app/build/intermediates/cxx/Debug/5o4o6941/obj/armeabi-v7a/libreact_codegen_safeareacontext.so	df4f815d19d7235
+51614	51841	8148776035429028	C:/Users/user/Desktop/Splitify/react_native/android/app/build/intermediates/cxx/Debug/5o4o6941/obj/armeabi-v7a/libappmodules.so	47e495782dbf52b7
+8	341	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/armeabi-v7a/CMakeFiles/cmake.verify_globs	2dc8c39ed0a52aef
+20	377	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/armeabi-v7a/CMakeFiles/cmake.verify_globs	2dc8c39ed0a52aef

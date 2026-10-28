@@ -1,0 +1,16 @@
+# ninja log v5
+10	100	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/x86_64/CMakeFiles/cmake.verify_globs	5ce72eab3840427b
+66	20855	8148776951919297	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/177f9e84ea320733ac6f40f569bcd0e6/components/safeareacontext/EventEmitters.cpp.o	bc21111faa3ca713
+17	27543	8148777018612130	CMakeFiles/appmodules.dir/OnLoad.cpp.o	404651d10519c74
+50	33835	8148777079986867	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7f6cdfa359ae2861dbc93a7608266e97/components/safeareacontext/RNCSafeAreaViewState.cpp.o	ccfa6e33c09f3609
+84	41130	8148777152390423	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/177f9e84ea320733ac6f40f569bcd0e6/components/safeareacontext/ComponentDescriptors.cpp.o	a235f3b5261a4fa
+27545	51390	8148777252984974	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/1e69a0ba20377ba52c2d42899776c8c2/react/renderer/components/safeareacontext/States.cpp.o	d7eb737e3da14949
+3	54212	8148777279566613	CMakeFiles/appmodules.dir/C_/Users/user/Desktop/Splitify/react_native/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	662c11b7a51a2394
+34	55428	8148777293604631	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7dee8f662dfc9525e795060fc15a9d46/safeareacontext/RNCSafeAreaViewShadowNode.cpp.o	aad0c0b56a595e71
+20886	74227	8148777485920701	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/1e69a0ba20377ba52c2d42899776c8c2/react/renderer/components/safeareacontext/Props.cpp.o	af8708de0d69e4b
+41132	78858	8148777532777734	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/17c06556d9b64283ec4cbd3ab5113e36/source/codegen/jni/safeareacontext-generated.cpp.o	4a8c3ba00f57a1a3
+33845	80827	8148777551997737	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/7462b4d0fad7b61077b82c38757c59ff/renderer/components/safeareacontext/ShadowNodes.cpp.o	fce71cb48e2e8237
+80834	81405	8148777558373148	C:/Users/user/Desktop/Splitify/react_native/android/app/build/intermediates/cxx/Debug/5o4o6941/obj/x86_64/libreact_codegen_safeareacontext.so	9e510563b575e7ea
+81406	81780	8148777562083160	C:/Users/user/Desktop/Splitify/react_native/android/app/build/intermediates/cxx/Debug/5o4o6941/obj/x86_64/libappmodules.so	e7162110867e1b24
+7	171	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/x86_64/CMakeFiles/cmake.verify_globs	5ce72eab3840427b
+9	304	0	C:/Users/user/Desktop/Splitify/react_native/android/app/.cxx/Debug/5o4o6941/x86_64/CMakeFiles/cmake.verify_globs	5ce72eab3840427b
