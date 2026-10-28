@@ -27,3 +27,17 @@ Thumbs.db
 dist/
 build/
 .next/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# React Native / Expo build files
+android/app/build/
+ios/Pods/
+.expo/
+dist/
+build/
+
+# Environment variables
+.env
