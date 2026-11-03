@@ -5,6 +5,7 @@ import {
   Bell,
   User,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 
 import "./navbar.css";
@@ -20,6 +21,7 @@ const Navbar = ({
   },
   onClaimPayment,
   onNotifications,
+  onLogout,
 }) => {
   return (
     <header className="navbar">
@@ -86,6 +88,16 @@ const Navbar = ({
             </span>
           </div>
         </div>
+
+        <button
+          className="navbar__logout"
+          type="button"
+          onClick={onLogout}
+          aria-label="Logout"
+          title="Logout"
+        >
+          <LogOut size={15} />
+        </button>
       </div>
     </header>
   );

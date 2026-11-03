@@ -120,12 +120,14 @@ function App() {
           onNavigate={handleNavigation}
           activeItem="Dashboard"
           user={user}
+          onLogout={handleLogout}
         />
       ) : isManager ? (
         <ManagerSidebar
           onNavigate={handleNavigation}
           activeItem="Dashboard"
           user={user}
+          onLogout={handleLogout}
         />
       ) : (
         <Sidebar

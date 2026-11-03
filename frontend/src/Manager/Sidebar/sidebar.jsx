@@ -12,6 +12,7 @@ import {
   Wallet,
   BookOpen,
   ClipboardCheck,
+  LogOut,
 } from "lucide-react";
 
 import "./sidebar.css";
@@ -34,7 +35,7 @@ const getActivePage = (pathname) => {
   return pathname.replace("/", "");
 };
 
-export default function ManagerSidebar({ onNavigate }) {
+export default function ManagerSidebar({ onNavigate, onLogout }) {
   const location = useLocation();
 
   const [active, setActive] = useState(
@@ -206,6 +207,16 @@ export default function ManagerSidebar({ onNavigate }) {
               Splitfy Workspace
             </span>
           </div>
+
+          <button
+            type="button"
+            className="sidebar__logout-btn"
+            onClick={onLogout}
+            aria-label="Logout"
+            title="Logout"
+          >
+            <LogOut size={16} strokeWidth={1.5} />
+          </button>
         </footer>
       </aside>
     </>

@@ -248,7 +248,7 @@ export default function Home({ onLogin }) {
                   className={role === item.id ? "active" : ""}
                   onClick={() => {
                     setRole(item.id);
-                    setMode(item.id === "landlord" ? "signin" : "create");
+                    setMode("signin");
                     setMessage("");
                     setRoomCode("");
                     setRoomCodeStatus("");
@@ -264,8 +264,7 @@ export default function Home({ onLogin }) {
           </div>
 
           {/* SIGN IN / SIGN UP */}
-          {!isLandlord && (
-            <div className="segmented mode-switch" role="tablist">
+          <div className="segmented mode-switch" role="tablist">
               <button
                 type="button"
                 className={mode === "signin" ? "active" : ""}
@@ -294,21 +293,16 @@ export default function Home({ onLogin }) {
                 Create Account
               </button>
             </div>
-          )}
 
           <header className="form-heading">
             <h2>
-              {isLandlord
-                ? "Landlord Portal Login"
-                : mode === "create"
+              {mode === "create"
                 ? `Create your ${role} account`
                 : `Welcome back, ${role}`}
             </h2>
 
             <p>
-              {isLandlord
-                ? "Sign in to access your landlord portal."
-                : mode === "create"
+              {mode === "create"
                 ? "Join Splitify and manage your shared living experience."
                 : "Sign in to manage your shared living, rent, and bills."}
             </p>
@@ -488,11 +482,7 @@ export default function Home({ onLogin }) {
             )}
 
             <button className="submit-button" type="submit">
-              {isLandlord
-                ? "Landlord Sign In"
-                : mode === "create"
-                ? "Create Free Account"
-                : "Sign In"}
+              {mode === "create" ? "Create Free Account" : "Sign In"}
 
               <ArrowRight size={17} />
             </button>
@@ -502,8 +492,7 @@ export default function Home({ onLogin }) {
             )}
           </form>
 
-          {!isLandlord && (
-            <p className="card-footer">
+          <p className="card-footer">
               {mode === "create" ? (
                 <>
                   Already registered on Splitify?{" "}
@@ -532,7 +521,6 @@ export default function Home({ onLogin }) {
                 </>
               )}
             </p>
-          )}
 
           <div className="secure-note">
             <Check size={13} />

@@ -136,6 +136,23 @@
   text-align: center;
 }
 
+/* Logout */
+.navbar__logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.navbar__logout:hover {
+  color: #b45f06;
+}
+
 /* User */
 .navbar__user {
   display: flex;

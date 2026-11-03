@@ -9,7 +9,7 @@ import {
   ChartNoAxesCombined,
   DollarSign,
   BadgeCheck,
-  Settings,
+  LogOut,
   Building2,
 } from "lucide-react";
 
@@ -30,6 +30,7 @@ const RoommateSidebar = ({
   onNavigate,
   activeItem = "Dashboard",
   user,
+  onLogout,
 }) => {
   const location = useLocation();
 
@@ -108,9 +109,11 @@ const RoommateSidebar = ({
         <button
           type="button"
           className="roommate-settings-btn"
-          aria-label="Settings"
+          onClick={onLogout}
+          aria-label="Logout"
+          title="Logout"
         >
-          <Settings size={15} />
+          <LogOut size={15} />
         </button>
       </div>
     </aside>
