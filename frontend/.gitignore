@@ -22,11 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Environment Variables & Secret API Keys
-.env
-.env.local
-.env.development
-.env.production
-.env.test
-*.env
