@@ -1,0 +1,846 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  font-family: "Inter", Arial, sans-serif;
+  color: #10213a;
+  background: #f6f8ff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #f6f8ff;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #f7f8fe;
+  border: 1px solid #e5eaf4;
+}
+
+/* Top navigation */
+
+.topbar {
+  height: 45px;
+  padding: 0 14px 0 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #fbfcff;
+  border-bottom: 1px solid #e9edf5;
+  box-shadow: 0 2px 7px rgba(27, 47, 78, 0.035);
+}
+
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.topbar-left {
+  gap: 10px;
+  min-width: 0;
+}
+
+.property-pill,
+.cycle-pill {
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 12px;
+  font-size: 8px;
+}
+
+.property-pill {
+  gap: 5px;
+  padding: 0 8px 0 7px;
+  color: #243550;
+  background: #eaf2ff;
+}
+
+.property-pill strong {
+  font-size: 8.5px;
+  font-weight: 700;
+}
+
+.tiny-dot {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #77b4c9;
+}
+
+.pill-divider {
+  color: #7b91a9;
+}
+
+.active-label {
+  color: #007f79;
+  font-size: 7.5px;
+  letter-spacing: 0.35px;
+}
+
+.cycle-pill {
+  gap: 5px;
+  padding: 0 7px;
+  color: #435064;
+  background: #f0f3f7;
+}
+
+.topbar-right {
+  gap: 15px;
+  height: 100%;
+}
+
+.claim-button {
+  height: 21px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #a45100;
+  font-size: 8.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plus {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.notification-button {
+  width: 20px;
+  height: 25px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: #46566b;
+  background: transparent;
+}
+
+.notification-count {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: 1px;
+  right: -1px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #a85a08;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.profile-avatar {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #007d70;
+  border-radius: 50%;
+}
+
+.profile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.1;
+}
+
+.profile-copy strong {
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.profile-copy small {
+  font-size: 7px;
+  color: #46546b;
+}
+
+/* Dashboard heading */
+
+.dashboard {
+  padding: 14px 11px 0 17px;
+  margin-top: 2%;
+}
+
+.welcome-row {
+  min-height: 99px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.welcome-copy {
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.property-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 20px;
+  color: #087d91;
+}
+
+.property-label span {
+  padding: 3px 7px;
+  border-radius: 9px;
+  background: #e1edff;
+  font-size: 10px;
+  letter-spacing: 0.65px;
+  white-space: nowrap;
+}
+
+.property-label i {
+  color: #a1adbd;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.property-label small {
+  color: #60728d;
+  font-size: 9px;
+  letter-spacing: 0.45px;
+}
+
+h1 {
+  margin: 5px 0 3px;
+  color: #0d1d35;
+  font-size: 20px;
+  line-height: 1.15;
+  letter-spacing: -0.75px;
+  font-weight: 700;
+}
+
+.billing-row {
+  max-width: 350px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #263b58;
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.ledger-note {
+  max-width: 120px;
+  color: #b1bdca;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.status-stack {
+  width: 258px;
+  flex: 0 0 258px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-top: 4px;
+}
+
+.status-card {
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 10px;
+}
+
+.due-status {
+  color: #a84c00;
+  background: #fff0e5;
+}
+
+.lease-status {
+  width: 129px;
+  color: #007d78;
+  background: #ccf7f3;
+}
+
+.status-icon {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.due-status .status-icon {
+  border: 1.5px solid #e8892b;
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+.status-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.status-card small {
+  font-size: 9px;
+  letter-spacing: 0.25px;
+}
+
+.status-card strong {
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+/* Main cards */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.43fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 16px;
+}
+
+.statement-card {
+  min-width: 0;
+  padding: 16px 16px 10px;
+  border-radius: 9px 9px 0 0;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(27, 48, 81, 0.035);
+}
+
+.statement-heading,
+.statement-title {
+  display: flex;
+  align-items: center;
+}
+
+.statement-heading {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.statement-title {
+  gap: 8px;
+  color: #10223d;
+  font-size: 11px;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
+}
+
+.heading-icon {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: #008b94;
+  background: #edf4ff;
+}
+
+.pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: 12px;
+  color: #96501c;
+  background: #ffdbc1;
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pending-badge span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #bd620b;
+}
+
+.total-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 17px;
+}
+
+.total-amount {
+  color: #07172e;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -1.2px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.payable-label {
+  color: #53657b;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.invoice-line {
+  margin: 4px 0 10px;
+  color: #60738d;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.invoice-line span {
+  color: #8a9bb0;
+  margin: 0 2px;
+}
+
+.rent-breakdown {
+  padding: 9px 8px 8px;
+  border-radius: 6px;
+  background: #eef3ff;
+}
+
+.breakdown-labels {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 7px;
+  color: #152640;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.breakdown-labels span {
+  display: flex;
+  align-items: flex-start;
+}
+
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  margin: 4px 6px 0 0;
+  border-radius: 50%;
+}
+
+.rent-dot {
+  background: #007c71;
+}
+
+.utility-dot {
+  background: #a86009;
+}
+
+.breakdown-bar {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: #b66a08;
+}
+
+.breakdown-bar span {
+  width: 75%;
+  height: 100%;
+  display: block;
+  border-radius: 4px;
+  background: #007b70;
+}
+
+.rent-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 13px;
+}
+
+.rent-item {
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  background: #edf2ff;
+}
+
+.item-icon {
+  width: 12px;
+  flex: 0 0 12px;
+  display: grid;
+  place-items: center;
+}
+
+.item-icon.teal {
+  color: #008c80;
+}
+
+.item-icon.orange {
+  color: #c06c00;
+}
+
+.item-icon.blue {
+  color: #0085a0;
+}
+
+.item-icon.purple {
+  color: #62569a;
+}
+
+.item-copy {
+  min-width: 0;
+  flex: 1;
+  line-height: 1.35;
+}
+
+.item-title {
+  overflow: hidden;
+  color: #142642;
+  font-size: 10px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-detail {
+  overflow: hidden;
+  color: #61758f;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-amount {
+  flex: 0 0 auto;
+  color: #102039;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.statement-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 21px;
+}
+
+.statement-footer a {
+  color: #007d78;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.due-date {
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+  color: #667990;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
+}
+
+.due-date .icon {
+  margin-top: 1px;
+  color: #00878a;
+}
+
+/* Settlement panel */
+
+.gateway-card {
+  min-width: 0;
+  min-height: 520px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px 10px;
+  overflow: hidden;
+  border-radius: 9px 9px 0 0;
+  color: #eff5ff;
+  background: #20364b;
+  box-shadow: 0 3px 12px rgba(27, 48, 81, 0.06);
+}
+
+.gateway-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.gateway-bank-icon {
+  width: 17px;
+  flex: 0 0 17px;
+  display: grid;
+  place-items: center;
+  color: #31d3c7;
+}
+
+.gateway-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #d0dceb;
+  font-size: 10px;
+  letter-spacing: 0.65px;
+  white-space: nowrap;
+}
+
+.bank-name {
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.instant-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #55dfd1;
+  background: #174b50;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gateway-description {
+  margin: 14px 0 11px;
+  color: #d0dbea;
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.bank-detail {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 9px 8px;
+  border-radius: 6px;
+  background: #34495f;
+}
+
+.bank-detail > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  color: #c0cfdf;
+  font-size: 10px;
+  letter-spacing: 0.55px;
+  line-height: 1.25;
+}
+
+.bank-detail strong {
+  color: #fff;
+  font-size: 10.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.escrow-tag {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #52ddd1;
+  background: #254d59;
+  font-size: 9px;
+}
+
+.copy-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  color: #f4f7fc;
+  background: #60748c;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.iban-detail {
+  min-height: 72px;
+  align-items: flex-start;
+}
+
+.iban-detail .copy-button {
+  margin-top: 18px;
+}
+
+.gateway-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.pay-button,
+.cash-button {
+  width: 100%;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pay-button {
+  background: #a75700;
+}
+
+.cash-button {
+  min-height: 30px;
+  color: #edf4ff;
+  background: #354a62;
+}
+
+.cash-icon {
+  color: #dce8fb;
+  font-size: 13px;
+}
+
+/* Smaller screens */
+
+@media (max-width: 600px) {
+  .topbar {
+    height: auto;
+    min-height: 45px;
+    flex-wrap: wrap;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .topbar-left {
+    flex-wrap: wrap;
+  }
+
+  .topbar-right {
+    gap: 9px;
+  }
+
+  .profile-copy {
+    display: none;
+  }
+
+  .dashboard {
+    padding: 14px 12px 0;
+  }
+
+  .welcome-row {
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 14px;
+  }
+
+  .status-stack {
+    width: 100%;
+    flex: auto;
+    flex-direction: row;
+    padding-top: 0;
+  }
+
+  .status-card {
+    flex: 1;
+  }
+
+  .lease-status {
+    width: auto;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .gateway-card {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar-left {
+    gap: 5px;
+  }
+
+  .property-pill {
+    padding-right: 6px;
+  }
+
+  .active-label {
+    display: none;
+  }
+
+  .claim-button {
+    padding: 0 8px;
+  }
+
+  .status-stack {
+    flex-direction: column;
+  }
+
+  .total-amount {
+    font-size: 28px;
+  }
+
+  .statement-card {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+}
