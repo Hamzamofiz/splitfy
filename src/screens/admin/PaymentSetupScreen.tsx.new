@@ -1,0 +1,105 @@
+        <View style={[styles.card, styles.infoCard]}>
+          <Text style={styles.infoIcon}>ℹ️</Text>
+          <View style={styles.infoText}>
+            <Text style={styles.infoTitle}>How it works</Text>
+            <Text style={styles.infoBody}>
+              When roommates make payments using these details, they'll upload proof of payment.
+              You'll need to verify and approve each payment from the dashboard.
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Account Actions</Text>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+            <Text style={styles.logoutBtnText}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: Colors.canvas },
+  scroll: { flex: 1 },
+  content: { padding: 16, gap: 14, paddingBottom: 32 },
+  card: {
+    backgroundColor: Card.backgroundColor,
+    borderWidth: Card.borderWidth,
+    borderColor: Card.borderColor,
+    borderRadius: Card.borderRadius,
+    padding: 16,
+    gap: 12,
+  },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: Colors.textDark },
+  cardSub: { fontSize: 12, color: Colors.textSub, marginTop: -6 },
+  methodTabs: { flexDirection: 'row', backgroundColor: Colors.canvas, borderRadius: 10, padding: 4, gap: 4 },
+  methodTab: { flex: 1, alignItems: 'center', paddingVertical: 8, borderRadius: 8 },
+  methodTabActive: { backgroundColor: Colors.teal },
+  methodTabText: { fontSize: 12, fontWeight: '600', color: Colors.textSub },
+  methodTabTextActive: { color: '#fff' },
+  label: { fontSize: 12, fontWeight: '600', color: Colors.textDark },
+  input: {
+    height: Input.height,
+    borderWidth: Input.borderWidth,
+    borderColor: Colors.border,
+    borderRadius: Input.borderRadius,
+    paddingHorizontal: 14,
+    fontSize: 14,
+    color: Colors.textDark,
+    backgroundColor: Colors.canvas,
+    fontVariant: ['tabular-nums'],
+  },
+  keyBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.canvas,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  keyValue: { fontFamily: Font.bodyBold, fontSize: 16, fontWeight: '700', color: Colors.teal, letterSpacing: 1.5, fontVariant: ['tabular-nums'] },
+  copyBtn: { backgroundColor: Colors.tealLight, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6 },
+  copyBtnText: { fontSize: 12, color: Colors.teal, fontWeight: '700' },
+  qrContainer: { alignItems: 'center', paddingVertical: 8 },
+  qrPlaceholder: {
+    width: 160,
+    height: 160,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.canvas,
+    gap: 6,
+  },
+  qrIcon: { fontSize: 48 },
+  qrLabel: { fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  qrSub: { fontSize: 10, color: Colors.textSub },
+  keyActions: { flexDirection: 'row', gap: 10 },
+  keyActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    height: 44,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    backgroundColor: Colors.canvas,
+  },
+  keyActionIcon: { fontSize: 16 },
+  keyActionText: { fontSize: 13, fontWeight: '600', color: Colors.textDark },
+  infoCard: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  infoIcon: { fontSize: 20, marginTop: 2 },
+  infoText: { flex: 1, gap: 4 },
+  infoTitle: { fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  infoBody: { fontSize: 12, color: Colors.textSub, lineHeight: 18 },
+  logoutBtn: { backgroundColor: '#FEF2F2', borderWidth: 1, borderColor: '#FCA5A5', borderRadius: 12, alignItems: 'center', paddingVertical: 12 },
+  logoutBtnText: { color: '#DC2626', fontWeight: '700', fontSize: 14 },
+});
