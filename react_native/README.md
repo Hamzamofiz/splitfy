@@ -1,5 +1,13 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+## Splitify backend API
+
+The app connects to the Express API at `http://<host>:3000/api`. The default host is `10.0.2.2` on the Android emulator and `localhost` on iOS.
+
+For a physical device, set `API_HOST_OVERRIDE` near the top of `src/services/api.ts` to the development computer's LAN IP (for example, `192.168.1.20`). Keep the phone and computer on the same network and allow inbound connections to port 3000. The full API URL (including `/api`) can also be supplied before the app loads through `globalThis.__SPLITIFY_API_URL__`, or the hostname through `globalThis.__SPLITIFY_API_HOST__`.
+
+Configure `MONGO_URI` and `JWT_SECRET` in `backend/.env`, then start the backend from the `backend/` directory with `node index.js`. Authentication uses `/api/auth/login` and `/api/auth/signup`; the signup endpoint requires an invite code for Member accounts. Authenticated room, bill, expense, maintenance, settlement, and attendance requests include the saved bearer token.
+
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.

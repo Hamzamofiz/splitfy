@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
 const connectDb = require('./config/mongodb')
 
 connectDb();
@@ -14,13 +15,13 @@ app.use('/api/bills', require('./routes/billRentRoutes'));
 app.use('/api/expenses', require('./routes/expenseRoutes'));
 app.use('/api/settlements', require('./routes/settlementRoutes'));
 app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
-app.use('/api/agreements', require('./routes/agreementRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
 
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(3000, () => {
+app.listen(3000, '0.0.0.0', () => {
   console.log('Example app listening on port 3000!')
 })

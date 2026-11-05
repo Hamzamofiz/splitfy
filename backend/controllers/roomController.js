@@ -5,7 +5,11 @@ const crypto = require('crypto');
 // Create Room (Group Admin)
 const createRoom = async (req, res) => {
     try {
-        const { roomName, monthlyRent } = req.body;
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Only admins can create a room' });
+        }
+
+        const { roomName, monthlyRent, raastId, easypaisaNumber } = req.body;
 
         if (!roomName || !monthlyRent) {
             return res.status(400).json({ success: false, message: 'Please provide room name and monthly rent' });
@@ -19,6 +23,8 @@ const createRoom = async (req, res) => {
             admin: req.user._id, // Landlord ki jagah Admin
             members: [req.user._id],
             inviteCode,
+            raastId: raastId || '',
+            easypaisaNumber: easypaisaNumber || '',
         });
 
         // User profile mein bhi roomId save kar dein
@@ -28,6 +34,29 @@ const createRoom = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updateRoom = async (req, res) => {
+    try {
+        const room = await Room.findOne({ _id: req.params.id, admin: req.user._id });
+        if (!room) {
+            return res.status(404).json({ success: false, message: 'Room not found' });
+        }
+
+        const { roomName, monthlyRent, raastId, easypaisaNumber } = req.body;
+        if (roomName !== undefined) room.roomName = roomName;
+        if (monthlyRent !== undefined) room.monthlyRent = monthlyRent;
+        if (raastId !== undefined) room.raastId = raastId;
+        if (easypaisaNumber !== undefined) room.easypaisaNumber = easypaisaNumber;
+
+        const updatedRoom = await room.save();
+        await updatedRoom.populate('admin', 'name email phone role');
+        await updatedRoom.populate('members', 'name email phone role');
+
+        return res.json({ success: true, room: updatedRoom });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -108,5 +137,6 @@ module.exports = {
     createRoom,
     getRoom,
     joinRoom,
+    updateRoom,
     deleteRoom,
 };

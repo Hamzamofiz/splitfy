@@ -22,6 +22,16 @@ const roomSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Please specify the monthly rent or total budget'],
     },
+    raastId: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    easypaisaNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     inviteCode: {
       type: String,
       unique: true,

@@ -1,112 +1,146 @@
-import React, { useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { DocumentPickerResponse } from '@react-native-documents/picker';
 
-import FilePickerButton from '../../components/FilePickerButton';
+import ApiStatus from '../../components/ApiStatus';
 import ScreenHeader from '../../components/ScreenHeader';
 import { useRoleSession } from '../../navigation/RoleSessionContext';
 import type { RoommateTabParamList } from '../../navigation/types';
+import { authApi, billApi, expenseApi, getApiErrorMessage, settlementApi, type Bill, type Expense, type Settlement } from '../../services/api';
+import useRoomData from '../../services/useRoomData';
 import { Colors, Input } from '../../theme';
 
 type Props = BottomTabScreenProps<RoommateTabParamList, 'Home'>;
-const BILL_DATA = [
-  { name: 'Electricity', due: 'Due Oct 28', share: 1050, status: 'Due soon' },
-  { name: 'Internet', due: 'Due Nov 01', share: 625, status: 'Upcoming' },
-];
-const ACTIVITY = [
-  { title: 'Payment via Raast', note: 'PKR 1,200', status: 'Verified' },
-  { title: 'October electricity', note: 'Share added · PKR 1,050', status: 'Pending Approval' },
-  { title: 'Kitchen tap repair', note: 'Allocated share · PKR 180', status: 'Receipt Attached' },
-];
 
 export default function RoommateDashboardScreen({ navigation }: Props) {
-  const { signOut } = useRoleSession();
+  const { user, updateUser, signOut } = useRoleSession();
+  const { room, loading: roomLoading, error: roomError, reload: reloadRoom } = useRoomData();
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [name, setName] = useState('Member');
-  const [phone, setPhone] = useState('');
-  const [emergency, setEmergency] = useState('');
-  const [photo, setPhoto] = useState<DocumentPickerResponse | null>(null);
+  const [name, setName] = useState(user?.name ?? '');
+  const [phone, setPhone] = useState(user?.phone ?? '');
+  const [savingProfile, setSavingProfile] = useState(false);
 
-  const saveProfile = () => {
+  useEffect(() => {
+    setName(user?.name ?? '');
+    setPhone(user?.phone ?? '');
+  }, [user]);
+
+  const reload = useCallback(async () => {
+    if (!room) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [nextBills, nextExpenses, nextSettlements] = await Promise.all([
+        billApi.list(room._id),
+        expenseApi.list(room._id),
+        settlementApi.list(room._id),
+      ]);
+      setBills(nextBills);
+      setExpenses(nextExpenses);
+      setSettlements(nextSettlements);
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError));
+    } finally {
+      setLoading(false);
+    }
+  }, [room]);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  const saveProfile = async () => {
     if (!name.trim()) {
       Alert.alert('Name required', 'Enter your name before saving.');
       return;
     }
-    setName(name.trim());
-    setProfileOpen(false);
-    Alert.alert('Profile updated', 'Your profile was updated on this device.');
+    setSavingProfile(true);
+    try {
+      const updated = await authApi.updateProfile({ name: name.trim(), phone: phone.trim() });
+      await updateUser(updated);
+      setProfileOpen(false);
+      Alert.alert('Profile updated', 'Your profile was saved.');
+    } catch (requestError) {
+      Alert.alert('Unable to update profile', getApiErrorMessage(requestError));
+    } finally {
+      setSavingProfile(false);
+    }
   };
+
+  const myAssignments = bills.flatMap(bill => bill.assignedTo
+    .filter(assignment => typeof assignment.user === 'string' ? assignment.user === user?._id : assignment.user._id === user?._id)
+    .map(assignment => ({ bill, assignment })));
+  const dueTotal = myAssignments.filter(item => !item.assignment.isPaid).reduce((sum, item) => sum + item.assignment.shareAmount, 0);
+  const activity = [
+    ...settlements.map(item => ({ id: item._id, title: item.note || `${item.paymentMethod} settlement`, note: `PKR ${item.amount.toLocaleString()}`, status: item.status })),
+    ...expenses.map(item => ({ id: item._id, title: item.title, note: `PKR ${item.amount.toLocaleString()} · ${item.category}`, status: item.approvalStatus })),
+  ].slice(0, 3);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <ScreenHeader title="Home" subtitle="Your shared living overview" />
+          <ScreenHeader title="Home" subtitle={room?.roomName ?? 'Your shared living overview'} />
           <TouchableOpacity testID="open-profile" accessibilityLabel="Update profile" accessibilityRole="button" style={styles.avatar} onPress={() => setProfileOpen(true)}>
-            {photo ? <Image source={{ uri: photo.uri }} style={styles.avatarImage} /> : <Text style={styles.avatarText}>{name[0]?.toUpperCase() ?? 'M'}</Text>}
+            <Text style={styles.avatarText}>{name[0]?.toUpperCase() ?? 'M'}</Text>
           </TouchableOpacity>
         </View>
+        <ApiStatus loading={roomLoading || loading} error={roomError || error} onRetry={() => { if (roomError) reloadRoom(); else reload(); }} />
+        {!roomLoading && !roomError && !room ? <Text style={styles.muted}>No room is linked to your account. Ask your admin for a current invite code.</Text> : null}
         <View style={styles.balance}>
-          <Text style={styles.balanceLabel}>Your current balance</Text>
-          <Text style={styles.balanceValue}>PKR 2,675</Text>
-          <Text style={styles.balanceLabel}>Amount due this month</Text>
+          <Text style={styles.balanceLabel}>Your amount due this month</Text>
+          <Text style={styles.balanceValue}>PKR {dueTotal.toLocaleString()}</Text>
           <TouchableOpacity style={styles.lightButton} onPress={() => navigation.navigate('Settlement')}>
             <Text style={styles.lightButtonText}>View settlement</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.sectionTitle}>Quick actions</Text>
         <View style={styles.quickRow}>
-          <QuickAction label="Upload Daily Expense" onPress={() => navigation.navigate('Bills')} />
-          <QuickAction label="Mark Absent Days" onPress={() => navigation.navigate('Attendance')} />
-          <QuickAction label="Pay Bill" onPress={() => navigation.navigate('Bills')} />
+          <QuickAction label="Record an expense" onPress={() => navigation.navigate('Bills')} />
+          <QuickAction label="Mark absent days" onPress={() => navigation.navigate('Attendance')} />
+          <QuickAction label="Pay a bill" onPress={() => navigation.navigate('Bills')} />
         </View>
         <View style={styles.sectionRow}>
           <Text style={styles.sectionTitle}>Active bills</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Bills')}><Text style={styles.link}>View all</Text></TouchableOpacity>
         </View>
-        {BILL_DATA.map(bill => (
-          <View key={bill.name} style={styles.bill}>
+        {myAssignments.slice(0, 3).map(({ bill, assignment }) => (
+          <View key={bill._id} style={styles.bill}>
             <View style={styles.billInfo}>
-              <Text style={styles.billName}>{bill.name}</Text>
+              <Text style={styles.billName}>{bill.title}</Text>
               <View style={styles.billMeta}>
-                <Text style={[styles.badge, bill.status === 'Due soon' ? styles.pendingBadge : styles.successBadge]}>{bill.status}</Text>
-                <Text style={styles.muted}>{bill.due}</Text>
+                <Text style={[styles.badge, assignment.isPaid ? styles.successBadge : styles.pendingBadge]}>{assignment.isPaid ? 'Paid' : bill.status}</Text>
+                <Text style={styles.muted}>Due {new Date(bill.dueDate).toLocaleDateString()}</Text>
               </View>
             </View>
-            <Text style={styles.money}>PKR {bill.share.toLocaleString()}</Text>
+            <Text style={styles.money}>PKR {assignment.shareAmount.toLocaleString()}</Text>
           </View>
         ))}
+        {!loading && room && myAssignments.length === 0 ? <Text style={styles.muted}>There are no bills assigned to you yet.</Text> : null}
         <Text style={styles.sectionTitle}>Recent activity</Text>
         <View style={styles.card}>
-          {ACTIVITY.map((item, index) => (
-            <View key={item.title} style={[styles.activity, index > 0 && styles.divider]}>
-              <View style={styles.activityCopy}>
-                <Text style={styles.activityTitle}>{item.title}</Text>
-                <Text style={styles.muted}>{item.note}</Text>
-              </View>
-              <Text style={[styles.badge, item.status === 'Verified' ? styles.successBadge : styles.pendingBadge]}>{item.status}</Text>
+          {activity.map((item, index) => (
+            <View key={item.id} style={[styles.activity, index > 0 && styles.divider]}>
+              <View style={styles.activityCopy}><Text style={styles.activityTitle}>{item.title}</Text><Text style={styles.muted}>{item.note}</Text></View>
+              <Text style={[styles.badge, item.status === 'Completed' || item.status === 'APPROVED' ? styles.successBadge : styles.pendingBadge]}>{item.status}</Text>
             </View>
           ))}
+          {!loading && room && activity.length === 0 ? <Text style={styles.muted}>No recent activity.</Text> : null}
         </View>
       </ScrollView>
 
       <Modal visible={profileOpen} animationType="slide" transparent onRequestClose={() => setProfileOpen(false)}>
-        <View style={styles.backdrop}>
-          <View style={styles.modal}>
-            <View style={styles.modalHead}>
-              <Text style={styles.modalTitle}>Update profile</Text>
-              <TouchableOpacity onPress={() => setProfileOpen(false)}><Text style={styles.link}>Close</Text></TouchableOpacity>
-            </View>
-            <Field label="Name" value={name} onChangeText={setName} testID="profile-name" />
-            <Field label="Phone" value={phone} onChangeText={setPhone} testID="profile-phone" keyboardType="phone-pad" />
-            <Field label="Emergency contact" value={emergency} onChangeText={setEmergency} testID="profile-emergency-contact" />
-            <FilePickerButton testID="profile-photo-picker" kind="photo" onPicked={setPhoto} />
-            <TouchableOpacity testID="save-profile" style={styles.primaryButton} onPress={saveProfile}><Text style={styles.primaryText}>Save profile</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => { setProfileOpen(false); signOut(); }}><Text style={styles.signOut}>Sign out</Text></TouchableOpacity>
-          </View>
-        </View>
+        <View style={styles.backdrop}><View style={styles.modal}>
+          <View style={styles.modalHead}><Text style={styles.modalTitle}>Update profile</Text><TouchableOpacity onPress={() => setProfileOpen(false)}><Text style={styles.link}>Close</Text></TouchableOpacity></View>
+          <Field label="Name" value={name} onChangeText={setName} testID="profile-name" />
+          <Field label="Phone" value={phone} onChangeText={setPhone} testID="profile-phone" keyboardType="phone-pad" />
+          <TouchableOpacity testID="save-profile" style={styles.primaryButton} disabled={savingProfile} onPress={saveProfile}><Text style={styles.primaryText}>{savingProfile ? 'Saving…' : 'Save profile'}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => { setProfileOpen(false); signOut().catch(requestError => Alert.alert('Unable to sign out', getApiErrorMessage(requestError))); }}><Text style={styles.signOut}>Sign out</Text></TouchableOpacity>
+        </View></View>
       </Modal>
     </SafeAreaView>
   );
@@ -126,7 +160,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   avatar: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.teal, overflow: 'hidden' },
   avatarText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
-  avatarImage: { width: '100%', height: '100%' },
   balance: { backgroundColor: Colors.teal, padding: 18, borderRadius: 18, gap: 6 },
   balanceLabel: { color: '#D5FFFA', fontSize: 11 },
   balanceValue: { color: '#FFFFFF', fontSize: 29, fontWeight: '900', fontVariant: ['tabular-nums'] },

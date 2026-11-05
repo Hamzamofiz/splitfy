@@ -82,9 +82,16 @@ const updateMaintenance = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Maintenance issue not found' });
         }
 
+        const updates = {};
+        if (issueType !== undefined) updates.issueType = issueType;
+        if (description !== undefined) updates.description = description;
+        if (attachmentUrl !== undefined) updates.attachmentUrl = attachmentUrl;
+        if (status !== undefined) updates.status = status;
+        if (repairCost !== undefined) updates.repairCost = repairCost;
+
         maintenance = await Maintenance.findByIdAndUpdate(
             req.params.id,
-            { issueType, description, attachmentUrl, status, repairCost },
+            updates,
             { new: true, runValidators: true }
         );
 
