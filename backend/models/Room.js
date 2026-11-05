@@ -7,10 +7,10 @@ const roomSchema = new mongoose.Schema(
       required: [true, 'Please add a room or group name'],
       trim: true,
     },
-    landlord: {
+    admin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'A room must have a landlord or admin'],
+      required: [true, 'A room must have a group admin'],
     },
     members: [
       {
@@ -20,12 +20,12 @@ const roomSchema = new mongoose.Schema(
     ],
     monthlyRent: {
       type: Number,
-      required: [true, 'Please specify the monthly rent'],
+      required: [true, 'Please specify the monthly rent or total budget'],
     },
     inviteCode: {
       type: String,
       unique: true,
-      required: true,
+      required: false, // Backend controller isay khud generate karega
     },
   },
   {

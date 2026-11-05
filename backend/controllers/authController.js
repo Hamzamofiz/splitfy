@@ -8,17 +8,22 @@ const generateToken = (id) => {
     });
 };
 
-// Register
+// Register User
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, role, phone } = req.body;
 
         if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: 'Please fill all the required fields' });
+            return res.status(400).json({ success: false, message: 'Please fill all required fields' });
         }
 
+        // Strict role check for Admin vs Roommate
+        const userRole = role === 'admin' ? 'admin' : 'roommate';
+
         const userExist = await User.findOne({ email });
-        if (userExist) return res.status(400).json({ success: false, message: 'Email already registered' });
+        if (userExist) {
+            return res.status(400).json({ success: false, message: 'Email already registered' });
+        }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -27,7 +32,7 @@ const registerUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: role || 'roommate',
+            role: userRole,
             phone: phone || '',
         });
 
@@ -38,49 +43,55 @@ const registerUser = async (req, res) => {
                 name: newUser.name,
                 email: newUser.email,
                 role: newUser.role,
+                phone: newUser.phone,
+                roomId: newUser.roomId,
                 token: generateToken(newUser._id),
-            })
+            });
         } else {
             res.status(400).json({ success: false, message: 'Invalid user data' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: `${error.message}` });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Login 
+// Login User
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Please fill all the required fields' })
-        };
+            return res.status(400).json({ success: false, message: 'Please fill all required fields' });
+        }
+
         const isUser = await User.findOne({ email });
         if (!isUser) {
-            return res.status(400).json({ success: false, message: 'The user is Not existed' })
-        };
+            return res.status(400).json({ success: false, message: 'User does not exist' });
+        }
 
-        if (isUser && (await bcrypt.compare(password, isUser.password))) {
+        if (await bcrypt.compare(password, isUser.password)) {
             res.json({
                 success: true,
                 _id: isUser._id,
                 name: isUser.name,
                 email: isUser.email,
                 role: isUser.role,
+                phone: isUser.phone,
+                roomId: isUser.roomId,
                 token: generateToken(isUser._id),
             });
         } else {
             res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: `${error.message}` });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Get Profile
 const getUserProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id).select('-password');
         if (user) {
             res.json({
                 success: true,
@@ -88,23 +99,29 @@ const getUserProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                phone: user.phone
+                phone: user.phone,
+                roomId: user.roomId,
             });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: `${error.message}` });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Update Profile
 const updateUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
+
         if (user) {
             user.name = req.body.name || user.name;
             user.phone = req.body.phone || user.phone;
-            user.role = req.body.role || user.role;
+
+            if (req.body.role && ['admin', 'roommate'].includes(req.body.role)) {
+                user.role = req.body.role;
+            }
 
             if (req.body.password) {
                 const salt = await bcrypt.genSalt(10);
@@ -120,28 +137,30 @@ const updateUserProfile = async (req, res) => {
                 email: updatedUser.email,
                 role: updatedUser.role,
                 phone: updatedUser.phone,
+                roomId: updatedUser.roomId,
                 token: generateToken(updatedUser._id),
             });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: `${error.message}` });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
+// Delete Account
 const deleteUserAccount = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
 
         if (user) {
             await User.findByIdAndDelete(req.user._id);
-            res.json({ success: true, message: "User account deleted successfully" })
+            res.json({ success: true, message: 'User account deleted successfully' });
         } else {
             res.status(404).json({ success: false, message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: `${error.message}` });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
