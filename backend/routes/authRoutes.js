@@ -5,6 +5,7 @@ const { registerUser, loginUser, getUserProfile, updateUserProfile, deleteUserAc
 const {protect} = require('../middleware/authMiddleware');
 
 router.post('/register', registerUser);
+router.post('/signup', registerUser);
 router.post('/login', loginUser);
 
 router.get('/profile', protect, getUserProfile);

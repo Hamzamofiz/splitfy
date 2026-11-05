@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Room = require('../models/Room');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -11,16 +12,30 @@ const generateToken = (id) => {
 // Register User
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, role, phone } = req.body;
+        const { name, email, password, role, phone, inviteCode } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ success: false, message: 'Please fill all required fields' });
         }
 
-        // Strict role check for Admin vs Roommate
-        const userRole = role === 'admin' ? 'admin' : 'roommate';
+        if (role && !['admin', 'roommate'].includes(role)) {
+            return res.status(400).json({ success: false, message: 'Invalid account role' });
+        }
 
-        const userExist = await User.findOne({ email });
+        const userRole = role || 'roommate';
+        let room = null;
+        if (userRole === 'roommate') {
+            if (!inviteCode || !inviteCode.trim()) {
+                return res.status(400).json({ success: false, message: 'Please provide a room invite code' });
+            }
+            room = await Room.findOne({ inviteCode: inviteCode.trim().toUpperCase() });
+            if (!room) {
+                return res.status(404).json({ success: false, message: 'Invalid invite code' });
+            }
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const userExist = await User.findOne({ email: normalizedEmail });
         if (userExist) {
             return res.status(400).json({ success: false, message: 'Email already registered' });
         }
@@ -29,26 +44,39 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = await User.create({
-            name,
-            email,
+            name: name.trim(),
+            email: normalizedEmail,
             password: hashedPassword,
             role: userRole,
             phone: phone || '',
+            roomId: room ? room._id : null,
         });
 
         if (newUser) {
-            res.status(201).json({
-                success: true,
-                _id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-                phone: newUser.phone,
-                roomId: newUser.roomId,
-                token: generateToken(newUser._id),
-            });
+            try {
+                if (room) {
+                    await Room.updateOne(
+                        { _id: room._id },
+                        { $addToSet: { members: newUser._id } }
+                    );
+                }
+            } catch (error) {
+                await User.findByIdAndDelete(newUser._id);
+                throw error;
+            }
+
+            return res.status(201).json({
+                    success: true,
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    role: newUser.role,
+                    phone: newUser.phone,
+                    roomId: newUser.roomId,
+                    token: generateToken(newUser._id),
+                });
         } else {
-            res.status(400).json({ success: false, message: 'Invalid user data' });
+            return res.status(400).json({ success: false, message: 'Invalid user data' });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -64,7 +92,7 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please fill all required fields' });
         }
 
-        const isUser = await User.findOne({ email });
+        const isUser = await User.findOne({ email: email.trim().toLowerCase() });
         if (!isUser) {
             return res.status(400).json({ success: false, message: 'User does not exist' });
         }

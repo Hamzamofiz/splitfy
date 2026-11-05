@@ -1,27 +1,47 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { DocumentPickerResponse } from '@react-native-documents/picker';
 
-import FilePickerButton from '../../components/FilePickerButton';
+import ApiStatus from '../../components/ApiStatus';
 import ScreenHeader from '../../components/ScreenHeader';
+import { getApiErrorMessage, maintenanceApi, type MaintenanceIssue } from '../../services/api';
+import useRoomData from '../../services/useRoomData';
 import { Colors, Input } from '../../theme';
 
-const CATEGORIES = ['Plumbing', 'Electrical', 'Appliance', 'Structural', 'Other'];
-type Request = { id: string; category: string; description: string; estimate: number; status: string; file?: string };
+const CATEGORIES = ['AC', 'Plumbing', 'Electricity', 'Carpentry', 'Other'];
 
 export default function ReportMaintenanceScreen() {
+  const { room, loading: roomLoading, error: roomError, reload: reloadRoom } = useRoomData();
   const [category, setCategory] = useState('Plumbing');
   const [description, setDescription] = useState('');
   const [estimate, setEstimate] = useState('');
-  const [members, setMembers] = useState(4);
-  const [file, setFile] = useState<DocumentPickerResponse | null>(null);
-  const [requests, setRequests] = useState<Request[]>([
-    { id: 'initial', category: 'Plumbing', description: 'Kitchen tap repair', estimate: 720, status: 'Allocated' },
-  ]);
+  const [requests, setRequests] = useState<MaintenanceIssue[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const memberCount = Math.max(1, room?.members.length ?? 1);
 
-  const submit = () => {
+  const reload = useCallback(async () => {
+    if (!room) return;
+    setLoading(true);
+    setError(null);
+    try {
+      setRequests(await maintenanceApi.list(room._id));
+    } catch (requestError) {
+      setError(getApiErrorMessage(requestError));
+    } finally {
+      setLoading(false);
+    }
+  }, [room]);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  const submit = async () => {
     const cost = estimate.trim() ? Number(estimate) : 0;
+    if (!room) {
+      Alert.alert('Room required', 'Join a room before reporting maintenance.');
+      return;
+    }
     if (!description.trim()) {
       Alert.alert('Description required', 'Describe the repair issue.');
       return;
@@ -30,16 +50,30 @@ export default function ReportMaintenanceScreen() {
       Alert.alert('Invalid cost', 'Enter a valid non-negative PKR estimate.');
       return;
     }
-    setRequests(current => [{ id: `${Date.now()}`, category, description: description.trim(), estimate: cost, status: 'Submitted', file: file?.name ?? undefined }, ...current]);
-    setDescription('');
-    setEstimate('');
-    setFile(null);
+    setSaving(true);
+    try {
+      const request = await maintenanceApi.create({
+        roomId: room._id,
+        issueType: category,
+        description: description.trim(),
+        repairCost: cost,
+      });
+      setRequests(current => [request, ...current]);
+      setDescription('');
+      setEstimate('');
+    } catch (requestError) {
+      Alert.alert('Unable to submit request', getApiErrorMessage(requestError));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         <ScreenHeader title="Maintenance" subtitle="Report repairs and follow your shared cost allocation." />
+        <ApiStatus loading={roomLoading || loading} error={roomError || error} onRetry={() => { if (roomError) reloadRoom(); else reload(); }} />
+        {!roomLoading && !roomError && !room ? <Text style={styles.muted}>Join a room to report and follow maintenance requests.</Text> : null}
         <View style={styles.form}>
           <Text style={styles.section}>Report an issue</Text>
           <Text style={styles.label}>Issue category</Text>
@@ -50,23 +84,18 @@ export default function ReportMaintenanceScreen() {
           <TextInput testID="maintenance-description" style={[styles.input, styles.multiline]} value={description} onChangeText={setDescription} placeholder="Describe the issue and location..." multiline />
           <Text style={styles.label}>Estimated repair cost (PKR, optional)</Text>
           <TextInput testID="maintenance-estimate" style={styles.input} value={estimate} onChangeText={setEstimate} keyboardType="numeric" placeholder="0" />
-          <FilePickerButton testID="maintenance-photo-picker" kind="media" onPicked={setFile} />
-          {file ? <Text style={styles.muted}>Attached: {file.name ?? 'media file'}</Text> : null}
-          <View style={styles.memberRow}>
-            <View style={styles.memberInfo}><Text style={styles.label}>Active room members</Text><Text style={styles.muted}>Split dynamically across {members} active room members</Text></View>
-            <TouchableOpacity testID="maintenance-member-decrease" style={styles.memberButton} onPress={() => setMembers(current => Math.max(1, current - 1))}><Text style={styles.memberButtonText}>−</Text></TouchableOpacity>
-            <Text style={styles.memberCount}>{members}</Text>
-            <TouchableOpacity testID="maintenance-member-increase" style={styles.memberButton} onPress={() => setMembers(current => current + 1)}><Text style={styles.memberButtonText}>+</Text></TouchableOpacity>
-          </View>
-          <TouchableOpacity testID="maintenance-submit" style={styles.submit} onPress={submit}><Text style={styles.submitText}>Submit maintenance request</Text></TouchableOpacity>
+          <Text style={styles.muted}>Active room members: {memberCount}</Text>
+          <TouchableOpacity testID="maintenance-submit" style={[styles.submit, saving && styles.disabled]} disabled={saving} onPress={submit}><Text style={styles.submitText}>{saving ? 'Submitting…' : 'Submit maintenance request'}</Text></TouchableOpacity>
         </View>
         <Text style={styles.section}>Your requests & allocated shares</Text>
-        {requests.map(request => <View key={request.id} style={styles.request}>
-          <View style={styles.requestHead}><Text style={styles.requestTitle}>{request.category}</Text><Text style={[styles.status, request.status === 'Allocated' ? styles.allocated : styles.pending]}>{request.status}</Text></View>
-          <Text style={styles.muted}>{request.description}</Text>
-          {request.file ? <Text style={styles.muted}>Attachment: {request.file}</Text> : null}
-          {request.estimate ? <Text style={styles.cost}>PKR {request.estimate.toLocaleString()} total · PKR {Math.ceil(request.estimate / members).toLocaleString()} each / {members} members</Text> : <Text style={styles.muted}>Share is calculated when repair cost is allocated.</Text>}
-        </View>)}
+        {requests.map(request => (
+          <View key={request._id} style={styles.request}>
+            <View style={styles.requestHead}><Text style={styles.requestTitle}>{request.issueType}</Text><Text style={[styles.status, request.status === 'RESOLVED' ? styles.allocated : styles.pending]}>{request.status.toLowerCase().replace('_', ' ')}</Text></View>
+            <Text style={styles.muted}>{request.description}</Text>
+            {request.repairCost > 0 ? <Text style={styles.cost}>PKR {request.repairCost.toLocaleString()} total · PKR {Math.ceil(request.repairCost / memberCount).toLocaleString()} each / {memberCount} members</Text> : <Text style={styles.muted}>Share will be calculated when repair cost is allocated.</Text>}
+          </View>
+        ))}
+        {!loading && room && requests.length === 0 ? <Text style={styles.muted}>No maintenance requests yet.</Text> : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -86,13 +115,9 @@ const styles = StyleSheet.create({
   input: { height: Input.height, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 10, color: Colors.textDark, backgroundColor: Colors.canvas },
   multiline: { height: 82, paddingTop: 10, textAlignVertical: 'top' },
   muted: { color: Colors.textSub, fontSize: 10 },
-  memberRow: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 9, backgroundColor: Colors.canvas, borderRadius: 10 },
-  memberInfo: { flex: 1, gap: 3 },
-  memberButton: { width: 29, height: 29, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.teal },
-  memberButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  memberCount: { color: Colors.textDark, fontSize: 12, fontWeight: '800' },
   submit: { minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.teal },
   submitText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
+  disabled: { opacity: 0.6 },
   request: { padding: 13, gap: 8, borderWidth: 1, borderColor: Colors.border, borderRadius: 13, backgroundColor: Colors.card },
   requestHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   requestTitle: { color: Colors.textDark, fontSize: 12, fontWeight: '700' },
