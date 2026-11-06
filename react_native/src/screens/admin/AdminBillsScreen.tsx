@@ -100,10 +100,10 @@ export default function AdminBillsScreen() {
         })}
         <View style={styles.form}>
           <Text style={styles.section}>Add group bill</Text>
-          <TextInput testID="admin-bill-title" style={styles.input} value={title} onChangeText={setTitle} placeholder="Bill title" />
+          <TextInput testID="admin-bill-title" style={styles.input} value={title} onChangeText={setTitle} placeholder="Bill title (e.g., Electricity)" placeholderTextColor={Colors.textLight} />
           <View style={styles.row}>{BILL_TYPES.map(item => <TouchableOpacity key={item} style={[styles.chip, category === item && styles.chipActive]} onPress={() => setCategory(item)}><Text style={[styles.chipText, category === item && styles.chipTextActive]}>{item}</Text></TouchableOpacity>)}</View>
-          <TextInput testID="admin-bill-amount" style={styles.input} value={amount} onChangeText={setAmount} placeholder="Total amount (PKR)" keyboardType="numeric" />
-          <TextInput testID="admin-bill-due" style={styles.input} value={due} onChangeText={setDue} placeholder="Due date (YYYY-MM-DD)" />
+          <TextInput testID="admin-bill-amount" style={styles.input} value={amount} onChangeText={setAmount} placeholder="Amount in PKR (e.g., 2000)" placeholderTextColor={Colors.textLight} keyboardType="numeric" />
+          <TextInput testID="admin-bill-due" style={styles.input} value={due} onChangeText={setDue} placeholder="Due date (YYYY-MM-DD)" placeholderTextColor={Colors.textLight} />
           <TouchableOpacity testID="admin-add-bill" style={[styles.submit, saving && styles.disabled]} onPress={addBill} disabled={saving}><Text style={styles.submitText}>{saving ? 'Saving…' : 'Add bill'}</Text></TouchableOpacity>
         </View>
       </ScrollView>
