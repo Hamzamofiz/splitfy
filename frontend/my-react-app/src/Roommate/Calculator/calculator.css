@@ -1,0 +1,920 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.absence-page {
+  min-height: 100vh;
+  padding: 15px;
+  background: #f4f6fa;
+  color: #17304d;
+  font-family: 'Inter', sans-serif;
+  animation: absenceEnter .5s ease both;
+}
+
+.absence-page * {
+  box-sizing: border-box;
+}
+
+@keyframes absenceEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* HEADER */
+
+.absence-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+  animation: absenceEnter .6s ease both;
+}
+
+.absence-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  margin-bottom: 5px;
+  border-radius: 20px;
+  background: #e1f8f4;
+  color: #00877b;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.absence-breadcrumb span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #009c8d;
+}
+
+.absence-header h1 {
+  margin: 0 0 4px;
+  color: #142b49;
+  font-size: clamp(20px, 2.4vw, 23px);
+  font-weight: 800;
+  letter-spacing: -.8px;
+}
+
+.absence-header p {
+  max-width: 590px;
+  margin: 0;
+  color: #60748e;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.absence-ledger-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #e0e8f1;
+  border-radius: 8px;
+  background: white;
+  color: #087e74;
+  font-size: 8px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+/* STATS */
+
+.absence-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.absence-stat-card {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #e2e9f2;
+  border-radius: 9px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(20, 40, 70, .025);
+  animation: absenceCard .55s ease both;
+  transition: transform .25s, box-shadow .25s;
+}
+
+.absence-stat-card:nth-child(2) { animation-delay: .08s; }
+.absence-stat-card:nth-child(3) { animation-delay: .16s; }
+.absence-stat-card:nth-child(4) { animation-delay: .24s; }
+
+@keyframes absenceCard {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.absence-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 18px rgba(30, 50, 80, .07);
+}
+
+.absence-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  min-height: 19px;
+  margin-bottom: 10px;
+  color: #71839a;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+.absence-stat-top svg {
+  color: #8195b0;
+}
+
+.absence-stat-card > strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #1c3451;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+.absence-stat-card > small {
+  display: block;
+  color: #71849c;
+  font-size: 8px;
+}
+
+.absence-orange { color: #e88b17 !important; }
+.absence-green { color: #008b7d !important; }
+
+.absence-orange-badge,
+.absence-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border-radius: 15px;
+  font-size: 7px;
+  font-weight: 750;
+}
+
+.absence-orange-badge {
+  background: #fff0c6;
+  color: #a96700;
+}
+
+.absence-saved-badge {
+  background: #d9fbf2;
+  color: #008b7b;
+}
+
+.absence-stat-progress {
+  height: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #edf1f7;
+}
+
+.absence-stat-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #009482;
+  transition: width .4s ease;
+}
+
+.absence-stat-progress.orange-progress span {
+  background: #ff9c00;
+}
+
+.savings-stat {
+  background: #fbffff;
+}
+
+.absence-saving-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  color: #008b7d;
+  font-size: 8px;
+}
+
+/* MAIN LAYOUT */
+
+.absence-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, .95fr);
+  align-items: start;
+  gap: 15px;
+}
+
+.absence-left,
+.absence-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* PANELS */
+
+.absence-panel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e1e8f1;
+  border-radius: 9px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(25, 45, 75, .025);
+  animation: absenceCard .6s ease both;
+  transition: box-shadow .25s, border-color .25s;
+}
+
+.absence-panel:hover {
+  border-color: #d4e6e4;
+  box-shadow: 0 6px 18px rgba(25, 45, 75, .05);
+}
+
+.absence-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.absence-panel-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #193650;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.absence-panel-heading h2 svg {
+  color: #008b7d;
+  flex-shrink: 0;
+}
+
+.absence-simulation {
+  padding: 5px 7px;
+  border: 1px solid #c9f2e8;
+  border-radius: 5px;
+  background: #f0fffa;
+  color: #607b8e;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.absence-simulation strong {
+  color: #008a7c;
+}
+
+/* SLIDER */
+
+.absence-slider-wrap {
+  padding: 2px 2px 10px;
+}
+
+.absence-slider-wrap input {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  border-radius: 10px;
+  outline: none;
+  background: linear-gradient(
+    to right,
+    #008b7e 0%,
+    #008b7e var(--slider-progress),
+    #e1e7f0 var(--slider-progress),
+    #e1e7f0 100%
+  );
+  cursor: pointer;
+}
+
+.absence-slider-wrap input::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  appearance: none;
+  border: 1.5px solid #a8b5c6;
+  border-radius: 5px;
+  background: white;
+  cursor: grab;
+  transition: transform .2s, border-color .2s;
+}
+
+.absence-slider-wrap input::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  border-color: #008b7d;
+}
+
+.absence-slider-wrap input::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #a8b5c6;
+  border-radius: 5px;
+  background: white;
+  cursor: grab;
+}
+
+.absence-slider-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 8px;
+  color: #7186a4;
+  font-size: 8px;
+}
+
+.absence-quick-label {
+  margin: 6px 0 8px;
+  color: #71839a;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+.absence-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.absence-preset {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #dce5f1;
+  border-radius: 5px;
+  background: #f4f7fc;
+  color: #294460;
+  font-size: 8px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.absence-preset:hover {
+  border-color: #008c7e;
+  color: #008577;
+  transform: translateY(-2px);
+}
+
+.absence-preset.active {
+  border-color: #008679;
+  background: #008679;
+  color: white;
+  box-shadow: 0 3px 8px rgba(0, 134, 121, .15);
+}
+
+/* DATE SELECTOR */
+
+.absence-room-badge {
+  padding: 4px 7px;
+  border: 1px solid #e0e8f3;
+  border-radius: 4px;
+  background: #f5f8fd;
+  color: #637c9b;
+  font-size: 7px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.absence-date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.absence-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 13px;
+}
+
+.absence-field label {
+  color: #526b86;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+.absence-input {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 37px;
+  padding: 0 9px;
+  border: 1px solid #e1e9f2;
+  border-radius: 6px;
+  background: #f6f8fc;
+  color: #7990a8;
+  transition: .25s ease;
+}
+
+.absence-input:focus-within {
+  border-color: #008d80;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 141, 128, .06);
+}
+
+.absence-input input,
+.absence-input select {
+  width: 100%;
+  min-width: 0;
+  height: 35px;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #253e5b;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.absence-input select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.absence-input input[type="date"] {
+  color-scheme: light;
+}
+
+.full-field {
+  width: 100%;
+}
+
+.absence-field textarea {
+  width: 100%;
+  min-height: 65px;
+  padding: 10px;
+  resize: vertical;
+  border: 1px solid #e1e9f2;
+  border-radius: 6px;
+  outline: none;
+  background: #f7f9fd;
+  color: #263e5b;
+  font-family: inherit;
+  font-size: 9px;
+  line-height: 1.6;
+  transition: .25s ease;
+}
+
+.absence-field textarea:focus {
+  border-color: #008b7d;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 139, 125, .06);
+}
+
+/* APPLY BUTTON */
+
+.absence-apply-button {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px;
+  border: none;
+  border-radius: 6px;
+  background: #007e73;
+  color: white;
+  font-size: 9px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.absence-apply-button svg:last-child {
+  margin-left: auto;
+}
+
+.absence-apply-button:hover {
+  background: #00675f;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 13px rgba(0, 126, 115, .18);
+}
+
+.absence-success {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  padding: 9px;
+  border-radius: 6px;
+  background: #e5f7f0;
+  color: #007d70;
+  font-size: 8px;
+  animation: absenceEnter .3s ease both;
+}
+
+/* COMPARISON */
+
+.absence-month-badge {
+  padding: 5px 8px;
+  border: 1px solid #e0e8f2;
+  border-radius: 4px;
+  background: #f5f7fc;
+  color: #627b9a;
+  font-size: 8px;
+}
+
+.absence-table-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 5px;
+  padding: 7px 5px;
+  border-top: 1px solid #eaf0f6;
+  border-bottom: 1px solid #eaf0f6;
+  background: #f6f8fc;
+  color: #71849c;
+  font-size: 7px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.absence-table-head span:first-child {
+  text-align: left;
+}
+
+.absence-expense-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 5px;
+  min-height: 43px;
+  padding: 7px 5px;
+  border-bottom: 1px solid #edf1f6;
+  color: #526a86;
+  font-size: 8px;
+  text-align: center;
+}
+
+.absence-expense-row:last-child {
+  border-bottom: none;
+}
+
+.absence-expense-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #263e59;
+  font-size: 8px;
+  font-weight: 650;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.absence-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.dot-0 { background: #008e80; }
+.dot-1 { background: #00a18c; }
+.dot-2 { background: #c4d0e2; }
+.dot-3 { background: #bacce5; }
+
+.absence-expense-row strong {
+  color: #203c59;
+  font-size: 8px;
+  overflow-wrap: anywhere;
+}
+
+.absence-delta {
+  color: #008c7c;
+  font-size: 8px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.absence-no-delta {
+  color: #8292a8;
+  font-size: 8px;
+}
+
+/* TOTAL BOX */
+
+.absence-total-box {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #e0e9f2;
+  border-radius: 8px;
+  background: #f8faff;
+}
+
+.absence-total-box > div:not(.absence-adjusted-total) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  margin-bottom: 8px;
+  color: #657b94;
+  font-size: 8px;
+}
+
+.absence-total-box > div > strong {
+  color: #263e59;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.absence-total-box .absence-credit-row {
+  color: #008c7d;
+}
+
+.absence-total-box .absence-credit-row span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.absence-total-box .absence-credit-row strong {
+  color: #008c7d;
+}
+
+.absence-adjusted-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 9px;
+  border-top: 1px solid #e2eaf2;
+}
+
+.absence-adjusted-total > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.absence-adjusted-total > div:last-child {
+  text-align: right;
+}
+
+.absence-adjusted-total > div:first-child strong {
+  color: #1c3856;
+  font-size: 9px;
+}
+
+.absence-adjusted-total > div:first-child small {
+  color: #788da5;
+  font-size: 8px;
+}
+
+.absence-adjusted-total > div:last-child strong {
+  color: #008b7c;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  overflow-wrap: anywhere;
+}
+
+.absence-adjusted-total > div:last-child small {
+  color: #d17c1b;
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+/* PAYMENT BAR */
+
+.absence-payment-bar {
+  margin-top: 14px;
+}
+
+.absence-payment-bar > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 7px;
+  color: #637a96;
+  font-size: 7px;
+  font-weight: 650;
+}
+
+.absence-payment-progress {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #edf1f7;
+}
+
+.absence-payment-progress span:first-child {
+  background: #009587;
+  transition: width .4s ease;
+}
+
+.absence-payment-progress span:last-child {
+  background: #f2a000;
+  transition: width .4s ease;
+}
+
+/* BREAKDOWN */
+
+.absence-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf1f6;
+  color: #687e98;
+  font-size: 9px;
+}
+
+.absence-breakdown-row strong {
+  color: #29415e;
+  font-size: 9px;
+}
+
+.absence-breakdown-row.highlight-row strong {
+  color: #008c7c;
+}
+
+.absence-breakdown-result {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 7px;
+  background: #eaf6f2;
+  color: #007d71;
+}
+
+.absence-breakdown-result span {
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.absence-breakdown-result strong {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+/* INFORMATION */
+
+.absence-info-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #dcebe9;
+  border-radius: 8px;
+  background: #eaf5f3;
+  color: #008579;
+}
+
+.absence-info-panel svg {
+  flex-shrink: 0;
+}
+
+.absence-info-panel strong {
+  font-size: 9px;
+}
+
+.absence-info-panel p {
+  margin: 5px 0 0;
+  color: #617f7b;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+/* BUTTON INTERACTIONS */
+
+.absence-page button:focus-visible {
+  outline: 2px solid #008b7d;
+  outline-offset: 3px;
+}
+
+.absence-page button:active {
+  transform: scale(.97);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .absence-main-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    gap: 10px;
+  }
+
+  .absence-stats {
+    gap: 7px;
+  }
+
+  .absence-stat-card {
+    padding: 9px;
+  }
+}
+
+@media (max-width: 750px) {
+  .absence-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .absence-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .absence-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .absence-page {
+    padding: 10px;
+  }
+
+  .absence-header h1 {
+    font-size: 20px;
+  }
+
+  .absence-header p {
+    font-size: 9px;
+  }
+
+  .absence-ledger-status {
+    white-space: normal;
+  }
+
+  .absence-panel {
+    padding: 11px;
+  }
+
+  .absence-panel-heading {
+    flex-wrap: wrap;
+  }
+
+  .absence-simulation {
+    font-size: 7px;
+  }
+
+  .absence-slider-labels {
+    font-size: 7px;
+  }
+
+  .absence-date-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .absence-presets {
+    gap: 6px;
+  }
+
+  .absence-preset {
+    font-size: 7px;
+  }
+
+  .absence-table-head,
+  .absence-expense-row {
+    gap: 3px;
+    font-size: 7px;
+  }
+
+  .absence-expense-name {
+    font-size: 7px;
+  }
+
+  .absence-expense-row strong,
+  .absence-delta,
+  .absence-no-delta {
+    font-size: 7px;
+  }
+
+  .absence-adjusted-total > div:last-child strong {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .absence-page *,
+  .absence-page *::before,
+  .absence-page *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

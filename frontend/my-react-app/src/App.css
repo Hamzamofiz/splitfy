@@ -1,0 +1,76 @@
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: "Inter", sans-serif;
+  background: #f4f6fb;
+}
+
+/* Main Application Layout */
+.app-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Main Dashboard Area */
+.main-content {
+  flex: 1;
+  width: calc(100% - 260px);
+  min-width: 0;
+  min-height: 100vh;
+
+  margin-left: 260px;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  transition:
+    margin-left 0.28s ease,
+    width 0.28s ease;
+}
+
+/* Sidebar Collapsed */
+.app-layout:has(.app-sidebar.sidebar-collapsed) .main-content {
+  width: calc(100% - 78px);
+  margin-left: 78px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .main-content {
+    width: calc(100% - 235px);
+    margin-left: 235px;
+  }
+
+  .app-layout:has(.app-sidebar.sidebar-collapsed) .main-content {
+    width: calc(100% - 75px);
+    margin-left: 75px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .main-content,
+  .app-layout:has(.app-sidebar.sidebar-collapsed) .main-content {
+    width: 100%;
+    margin-left: 0;
+    min-height: 100vh;
+  }
+}
+
