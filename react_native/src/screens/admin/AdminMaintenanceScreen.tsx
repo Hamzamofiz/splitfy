@@ -102,8 +102,8 @@ export default function AdminMaintenanceScreen() {
         })}
         <View style={styles.form}>
           <Text style={styles.section}>Add repair expense</Text>
-          <TextInput testID="admin-repair-title" style={styles.input} value={repairTitle} onChangeText={setRepairTitle} placeholder="Repair description" />
-          <TextInput testID="admin-repair-cost" style={styles.input} value={cost} onChangeText={setCost} placeholder="Total cost (PKR)" keyboardType="numeric" />
+          <TextInput testID="admin-repair-title" style={styles.input} value={repairTitle} onChangeText={setRepairTitle} placeholder="Expense Title / Description (e.g., AC Repair)" placeholderTextColor={Colors.textLight} />
+          <TextInput testID="admin-repair-cost" style={styles.input} value={cost} onChangeText={setCost} placeholder="Amount in PKR (e.g., 2000)" placeholderTextColor={Colors.textLight} keyboardType="numeric" />
           <TouchableOpacity testID="admin-add-repair" style={styles.allocateButton} disabled={savingId === 'new'} onPress={addIssue}><Text style={styles.allocateText}>{savingId === 'new' ? 'Saving…' : 'Add repair'}</Text></TouchableOpacity>
         </View>
       </ScrollView>

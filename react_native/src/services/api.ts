@@ -1,12 +1,6 @@
 import axios, { AxiosError } from 'axios';
-import { Platform } from 'react-native';
 
-declare global {
-  var __SPLITIFY_API_URL__: string | undefined;
-  var __SPLITIFY_API_HOST__: string | undefined;
-}
-
-const API_HOST_OVERRIDE = '';
+export const API_BASE_URL = 'https://backend-splitfy-second.onrender.com/api';
 
 export type UserRole = 'admin' | 'roommate';
 
@@ -90,19 +84,8 @@ function sessionFromResponse(response: AuthResponse) {
   return { user: { _id, name, email, role, phone, roomId }, token };
 }
 
-function getBaseUrl() {
-  if (globalThis.__SPLITIFY_API_URL__) {
-    return globalThis.__SPLITIFY_API_URL__.replace(/\/+$/, '');
-  }
-
-  const host = globalThis.__SPLITIFY_API_HOST__
-    || API_HOST_OVERRIDE
-    || (Platform.OS === 'android' ? '10.0.2.2' : 'localhost');
-  return `http://${host}:3000/api`;
-}
-
 export const apiClient = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: API_BASE_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
