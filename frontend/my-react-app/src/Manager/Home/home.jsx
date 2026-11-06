@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiRequest } from "../../services/api.js";
 import "./home.css";
 
 function Icon({ name, size = 16, className = "" }) {
@@ -21,12 +22,6 @@ function Icon({ name, size = 16, className = "" }) {
                 <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="10" cy="7" r="4" />
                 <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-            </>
-        ),
-        building: (
-            <>
-                <rect x="4" y="3" width="16" height="18" rx="2" />
-                <path d="M9 21v-4h6v4M8 7h.01M12 7h.01M16 7h.01M8 11h.01M12 11h.01M16 11h.01" />
             </>
         ),
         lock: (
@@ -56,45 +51,35 @@ function Icon({ name, size = 16, className = "" }) {
                 <circle cx="12" cy="12" r="3" />
             </>
         ),
-        key: (
-            <>
-                <circle cx="8" cy="15" r="4" />
-                <path d="m10.8 12.2 8-8 2 2-2 2 2 2-3 3-2-2-2 2" />
-            </>
-        ),
         arrow: (
             <path d="M5 12h14M13 6l6 6-6 6" />
         ),
-        bolt: <path d="m13 2-3 8h7l-6 12 2-9H6l7-11Z" />,
         check: <path d="m5 12 4 4L19 6" />,
     };
 
     return <svg {...common}>{paths[name] || null}</svg>;
 }
 
-export default function Splitfy({ onLogin }) {
-    const [mode, setMode] = useState("roommate");
+export default function Splitfy({ onLogin, initialMessage = "" }) {
     const [activeTab, setActiveTab] = useState("signup");
 
     const [showPassword, setShowPassword] = useState(false);
     const [showLoginPassword, setShowLoginPassword] = useState(false);
 
-    const [useOtp, setUseOtp] = useState(false);
     const [message, setMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        setMessage(initialMessage);
+    }, [initialMessage]);
 
     const [form, setForm] = useState({
         fullName: "",
         email: "",
         mobile: "",
-        inviteCode: "",
         password: "",
-        identifier: "",
-        loginPassword: "",
         accepted: false,
-        remember: true,
     });
-
-    const isManager = mode === "manager";
 
     // Update form fields
     function updateField(event) {
@@ -109,8 +94,10 @@ export default function Splitfy({ onLogin }) {
     }
 
     // Submit form
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+        if (isSubmitting) return;
+        setMessage("");
 
         // SIGNUP VALIDATION
         if (activeTab === "signup") {
@@ -144,47 +131,78 @@ export default function Splitfy({ onLogin }) {
                 return;
             }
 
-            setMessage(
-                "Your details look good. Signup API is not connected yet."
-            );
-
-            return;
         }
 
         // SIGNIN VALIDATION
-        if (!form.identifier.trim()) {
-            setMessage(
-                "Enter your mobile number or CNIC to continue."
-            );
+        if (!form.email.trim()) {
+            setMessage("Enter your email address to continue.");
             return;
         }
 
-        if (!form.loginPassword.trim()) {
-            setMessage(
-                useOtp
-                    ? "Enter the OTP sent to your phone."
-                    : "Enter your password."
-            );
+        if (!form.email.includes("@")) {
+            setMessage("Please enter a valid email address.");
             return;
         }
 
-        // PASS SELECTED ROLE TO APP.JSX
-        setMessage("");
+        if (!form.password.trim()) {
+            setMessage("Enter your password.");
+            return;
+        }
 
-        if (typeof onLogin === "function") {
-            onLogin(mode);
+        setIsSubmitting(true);
+        setMessage(
+            activeTab === "signup"
+                ? "Connecting to Splitfy. The service may take a little longer to start."
+                : "Connecting to Splitfy..."
+        );
+
+        try {
+            const response = activeTab === "signup"
+                ? await apiRequest("/auth/register", {
+                    method: "POST",
+                    body: {
+                        name: form.fullName.trim(),
+                        email: form.email.trim(),
+                        password: form.password,
+                        phone: form.mobile.trim(),
+                        role: "admin",
+                    },
+                })
+                : await apiRequest("/auth/login", {
+                    method: "POST",
+                    body: {
+                        email: form.email.trim(),
+                        password: form.password,
+                    },
+                });
+
+            if (!response.token || !response._id || !response.role) {
+                throw new Error("The server did not return a valid authenticated user.");
+            }
+
+            if (typeof onLogin === "function") {
+                onLogin(response, response.token);
+            }
+        } catch (requestError) {
+            console.error(
+                activeTab === "signup"
+                    ? "Account registration request failed."
+                    : "Account sign-in request failed.",
+                requestError
+            );
+            setMessage(
+                requestError?.status === null
+                    ? "We couldn't reach Splitfy. The service may be waking up; wait a moment, then try again."
+                    : requestError?.message || "Unable to authenticate your account."
+            );
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
     // Switch between signup and signin
     function switchTab(tab) {
         setActiveTab(tab);
-        setMessage("");
-    }
-
-    // Change portal
-    function switchMode(selectedMode) {
-        setMode(selectedMode);
         setMessage("");
     }
 
@@ -213,118 +231,14 @@ export default function Splitfy({ onLogin }) {
                             </span>
                         </a>
 
-                        <span
-                            className="status-light"
-                            title="All systems operational"
-                        />
-
                     </header>
 
                     <div className="hero-copy">
-
-                        <div className="hero-badge">
-                            <Icon name="bolt" size={13} />
-                            <span>Instant Rent &amp; Bill Splitting</span>
-                        </div>
 
                         <h1>
                             Split Smart.
                             <span>Live Stress-Free.</span>
                         </h1>
-
-                        <p>
-                            Smart rent splitting, utilities &amp; flatmate expenses
-                            for shared living and property owners across Pakistan.
-                        </p>
-
-                    </div>
-
-                    {/* FEATURE CARDS */}
-                    <div className="feature-grid">
-
-                        <article className="feature-card">
-
-                            <div className="feature-top">
-
-                                <span className="feature-icon aqua">
-                                    <Icon name="users" size={20} />
-                                </span>
-
-                                <span className="feature-tag">
-                                    Roommates
-                                </span>
-
-                            </div>
-
-                            <h2>Hostel &amp; Flatmates</h2>
-
-                            <p>
-                                Fair grocery division, real-time shared balances
-                                &amp; utility bill splits without the awkwardness.
-                            </p>
-
-                            <div className="mini-panel">
-
-                                <div className="mini-row">
-                                    <span>Wi-Fi &amp; Power Split</span>
-                                    <b>PKR 12,500 / each</b>
-                                </div>
-
-                                <div className="progress-track">
-                                    <span />
-                                </div>
-
-                                <div className="mini-row mini-bottom">
-                                    <span>Instant Rent &amp; Bill Splitting</span>
-                                    <b>Live Sync</b>
-                                </div>
-
-                            </div>
-
-                        </article>
-
-                        <article className="feature-card">
-
-                            <div className="feature-top">
-
-                                <span className="feature-icon peach">
-                                    <Icon name="building" size={20} />
-                                </span>
-
-                                <span className="feature-tag enterprise">
-                                    Enterprise
-                                </span>
-
-                            </div>
-
-                            <h2>Landlord &amp; Assets</h2>
-
-                            <p>
-                                Instant rent collection, tenant records, and
-                                automated monthly payment reminders.
-                            </p>
-
-                            <div className="mini-panel">
-
-                                <div className="mini-row">
-                                    <span>Portfolio Collection</span>
-                                    <b>98.4%</b>
-                                </div>
-
-                                <div className="progress-track">
-                                    <span className="progress-gold" />
-                                </div>
-
-                                <div className="mini-row mini-bottom">
-                                    <span>
-                                        Property &amp; Shared Living Platform - Pakistan
-                                    </span>
-                                    <b>Automated</b>
-                                </div>
-
-                            </div>
-
-                        </article>
 
                     </div>
 
@@ -344,42 +258,8 @@ export default function Splitfy({ onLogin }) {
                     }`}
                 >
 
-                    {/* PORTAL MODE */}
                     <div className="portal-heading">
-                        <span>SELECT YOUR PORTAL MODE</span>
-                        <span className="switch-hint">SWITCH ANYTIME</span>
-                    </div>
-
-                    <div
-                        className="portal-switch"
-                        role="group"
-                        aria-label="Portal mode"
-                    >
-
-                        <button
-                            type="button"
-                            className={
-                                mode === "roommate" ? "selected" : ""
-                            }
-                            onClick={() => switchMode("roommate")}
-                            aria-pressed={mode === "roommate"}
-                        >
-                            <Icon name="users" size={14} />
-                            Roommate
-                        </button>
-
-                        <button
-                            type="button"
-                            className={
-                                mode === "manager" ? "selected" : ""
-                            }
-                            onClick={() => switchMode("manager")}
-                            aria-pressed={mode === "manager"}
-                        >
-                            <Icon name="building" size={14} />
-                            Manager
-                        </button>
-
+                        <span>GROUP LEADER / MANAGER PORTAL</span>
                     </div>
 
                     {/* AUTH TABS */}
@@ -426,11 +306,7 @@ export default function Splitfy({ onLogin }) {
                                 <h2>Create your Splitfy account</h2>
 
                                 <p>
-                                    Instant Rent &amp; Bill Splitting for{" "}
-                                    {isManager
-                                        ? "property owners"
-                                        : "roommates"}{" "}
-                                    across Pakistan.
+                                    Create a Group Leader account to manage your room, members, bills, and expenses.
                                 </p>
 
                             </div>
@@ -514,52 +390,6 @@ export default function Splitfy({ onLogin }) {
                                         </div>
 
                                     </div>
-
-                                </div>
-
-                                {/* INVITE CODE */}
-                                <div className="invite-box">
-
-                                    <div className="invite-heading">
-
-                                        <span>
-                                            <Icon name="key" size={14} />
-                                            Have a Room Code or Unit Invite Link?
-                                        </span>
-
-                                        <small>Optional</small>
-
-                                    </div>
-
-                                    <div className="invite-input-row">
-
-                                        <input
-                                            name="inviteCode"
-                                            aria-label="Room code or unit invite code"
-                                            placeholder="ENTER CODE (E.G., SH-402)"
-                                            value={form.inviteCode}
-                                            onChange={updateField}
-                                        />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setMessage(
-                                                    form.inviteCode.trim()
-                                                        ? "Invite code saved. It will be checked when you create your account."
-                                                        : "Enter a room or unit invite code first."
-                                                )
-                                            }
-                                        >
-                                            Validate
-                                        </button>
-
-                                    </div>
-
-                                    <p>
-                                        Enter your flatmate&apos;s room token to auto-join
-                                        your Karachi, Lahore, or Islamabad home.
-                                    </p>
 
                                 </div>
 
@@ -648,7 +478,7 @@ export default function Splitfy({ onLogin }) {
                                 </label>
 
                                 {message && (
-                                    <p className="form-message" role="status">
+                                    <p className="form-message" role="status" aria-live="polite">
                                         {message}
                                     </p>
                                 )}
@@ -656,9 +486,10 @@ export default function Splitfy({ onLogin }) {
                                 <button
                                     className="submit-button"
                                     type="submit"
+                                    disabled={isSubmitting}
                                 >
-                                    Create Free Account
-                                    <Icon name="arrow" size={17} />
+                                    {isSubmitting ? "Creating account..." : "Create Free Account"}
+                                    {!isSubmitting && <Icon name="arrow" size={17} />}
                                 </button>
 
                             </form>
@@ -686,9 +517,8 @@ export default function Splitfy({ onLogin }) {
                                 <h2>Welcome back to Splitfy</h2>
 
                                 <p>
-                                    Enter your{" "}
-                                    {isManager ? "registered" : "Pakistani"}{" "}
-                                    mobile or CNIC to review dues and pay bills instantly.
+                                    Enter your email and password to review dues
+                                    and pay bills instantly.
                                 </p>
 
                             </div>
@@ -697,21 +527,22 @@ export default function Splitfy({ onLogin }) {
 
                                 <label
                                     className="field-label"
-                                    htmlFor="identifier"
+                                    htmlFor="email"
                                 >
-                                    Pakistani Phone Number (+92) or 13-digit CNIC
+                                    Email Address
                                 </label>
 
                                 <div className="input-wrap">
 
-                                    <Icon name="phone" size={15} />
+                                    <Icon name="mail" size={15} />
 
                                     <input
-                                        id="identifier"
-                                        name="identifier"
-                                        autoComplete="username"
-                                        placeholder="+92 300 1234567 or 42101-XXXXXXX-X"
-                                        value={form.identifier}
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        placeholder="name@domain.com"
+                                        value={form.email}
                                         onChange={updateField}
                                     />
 
@@ -726,22 +557,10 @@ export default function Splitfy({ onLogin }) {
 
                                     <label
                                         className="field-label"
-                                        htmlFor="loginPassword"
+                                        htmlFor="password"
                                     >
-                                        Password or WhatsApp OTP
+                                        Password
                                     </label>
-
-                                    <button
-                                        type="button"
-                                        className="text-link"
-                                        onClick={() =>
-                                            setMessage(
-                                                "Password reset instructions can be sent after you enter your mobile number."
-                                            )
-                                        }
-                                    >
-                                        Forgot password?
-                                    </button>
 
                                 </div>
 
@@ -750,20 +569,16 @@ export default function Splitfy({ onLogin }) {
                                     <Icon name="lock" size={15} />
 
                                     <input
-                                        id="loginPassword"
-                                        name="loginPassword"
+                                        id="password"
+                                        name="password"
                                         type={
                                             showLoginPassword
                                                 ? "text"
                                                 : "password"
                                         }
                                         autoComplete="current-password"
-                                        placeholder={
-                                            useOtp
-                                                ? "Enter WhatsApp OTP"
-                                                : "Enter password or WhatsApp code"
-                                        }
-                                        value={form.loginPassword}
+                                        placeholder="Enter your password"
+                                        value={form.password}
                                         onChange={updateField}
                                     />
 
@@ -786,48 +601,8 @@ export default function Splitfy({ onLogin }) {
 
                                 </div>
 
-                                {/* LOGIN OPTIONS */}
-                                <div className="login-options">
-
-                                    <label className="checkbox-row remember-row">
-
-                                        <input
-                                            type="checkbox"
-                                            name="remember"
-                                            checked={form.remember}
-                                            onChange={updateField}
-                                        />
-
-                                        <span>
-                                            Remember this device for 30 days
-                                        </span>
-
-                                    </label>
-
-                                    <button
-                                        type="button"
-                                        className="otp-link"
-                                        onClick={() => {
-                                            setUseOtp((value) => !value);
-
-                                            setMessage(
-                                                useOtp
-                                                    ? "Password sign-in selected."
-                                                    : "WhatsApp OTP sign-in selected. Enter your mobile number to continue."
-                                            );
-                                        }}
-                                    >
-                                        <Icon name="mail" size={13} />
-
-                                        {useOtp
-                                            ? "Use password"
-                                            : "Send WhatsApp OTP"}
-                                    </button>
-
-                                </div>
-
                                 {message && (
-                                    <p className="form-message" role="status">
+                                    <p className="form-message" role="status" aria-live="polite">
                                         {message}
                                     </p>
                                 )}
@@ -835,15 +610,16 @@ export default function Splitfy({ onLogin }) {
                                 <button
                                     className="submit-button"
                                     type="submit"
+                                    disabled={isSubmitting}
                                 >
-                                    Sign In &amp; Review Dues
-                                    <Icon name="arrow" size={17} />
+                                    {isSubmitting ? "Signing in..." : "Sign In & Review Dues"}
+                                    {!isSubmitting && <Icon name="arrow" size={17} />}
                                 </button>
 
                             </form>
 
                             <p className="form-footer">
-                                Don&apos;t have an active roommate or tenant workspace?{" "}
+                                Don&apos;t have a Group Leader account?{" "}
 
                                 <button
                                     type="button"

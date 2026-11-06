@@ -144,8 +144,33 @@ const updateUserProfile = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (user) {
-            user.name = req.body.name || user.name;
-            user.phone = req.body.phone || user.phone;
+            if (typeof req.body.name === 'string') {
+                const name = req.body.name.trim();
+                if (!name) {
+                    return res.status(400).json({ success: false, message: 'Name cannot be empty' });
+                }
+                user.name = name;
+            }
+
+            if (typeof req.body.email === 'string') {
+                const email = req.body.email.trim().toLowerCase();
+                if (!email) {
+                    return res.status(400).json({ success: false, message: 'Email cannot be empty' });
+                }
+
+                const existingUser = await User.findOne({
+                    email,
+                    _id: { $ne: user._id },
+                });
+                if (existingUser) {
+                    return res.status(400).json({ success: false, message: 'Email already registered' });
+                }
+                user.email = email;
+            }
+
+            if (typeof req.body.phone === 'string') {
+                user.phone = req.body.phone.trim();
+            }
 
             if (req.body.role && ['admin', 'roommate'].includes(req.body.role)) {
                 user.role = req.body.role;

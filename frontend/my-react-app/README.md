@@ -1,5 +1,16 @@
 # React + Vite
 
+## Splitfy API
+
+The web app is for Group Leaders / Managers and calls the Express API at
+`https://backend-splitfy-second.onrender.com/api` by default. Roommate accounts and the roommate
+portal are not supported on the web frontend.
+Set `VITE_API_URL` in a local Vite environment file or deployment environment to
+use another API base URL, for example `VITE_API_URL=https://example.com/api`.
+The `/api` suffix is added automatically when omitted. Authentication uses the
+backend's bearer token and profile endpoint; the API must be running for sign-in,
+room, bill, expense, settlement, maintenance, and attendance data.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:

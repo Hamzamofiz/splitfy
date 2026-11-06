@@ -11,7 +11,6 @@ import {
   Menu,
   X,
   LogOut,
-  Settings,
   Building2,
   ChevronRight,
 } from "lucide-react";
@@ -22,7 +21,7 @@ const navItems = [
   {
     label: "Dashboard",
     icon: LayoutDashboard,
-    path: "/roommate",
+    path: "/dashboard",
   },
   {
     label: "Utility Bills",
@@ -42,20 +41,11 @@ const navItems = [
   {
     label: "Expense Manager",
     icon: DollarSign,
-    path: "/expense",
+    path: "/expenses",
   },
 ];
 
-const Sidebar = ({
-  onLogout,
-  onSettings,
-  workspace = "Hostel Suite / Room 402",
-  workspaceType = "Master Ledger Active",
-  user = {
-    name: "Alex Rivera",
-    role: "Group Creator",
-  },
-}) => {
+const Sidebar = ({ onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -98,16 +88,6 @@ const Sidebar = ({
       onLogout();
     } else {
       navigate("/login");
-    }
-  };
-
-  const handleSettings = () => {
-    closeMobileMenu();
-
-    if (onSettings) {
-      onSettings();
-    } else {
-      navigate("/settings");
     }
   };
 
@@ -165,20 +145,12 @@ const Sidebar = ({
         {/* BRAND */}
         <div className="sidebar-brand">
           <div className="sidebar-brand-name">
-            <Building2 size={23} className="brand-icon" />
-
             {showFullSidebar && (
               <span>
                 Splitfy<span className="brand-accent">.</span>
               </span>
             )}
           </div>
-
-          {showFullSidebar && (
-            <span className="sidebar-admin-badge">
-              ADMIN
-            </span>
-          )}
 
           <button
             className="sidebar-menu-button"
@@ -196,25 +168,6 @@ const Sidebar = ({
           </button>
         </div>
 
-        {/* WORKSPACE */}
-        {showFullSidebar && (
-          <div className="workspace-card">
-            <span className="workspace-label">
-              ACTIVE WORKSPACE
-            </span>
-
-            <div className="workspace-name">
-              <Building2 size={15} />
-              <span>{workspace}</span>
-            </div>
-
-            <div className="workspace-status">
-              <span className="status-dot" />
-              <span>{workspaceType}</span>
-            </div>
-          </div>
-        )}
-
         {/* NAVIGATION */}
         <nav className="sidebar-navigation">
           <div className="sidebar-nav-list">
@@ -225,7 +178,7 @@ const Sidebar = ({
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  end={item.path === "/roommate"}
+                  end={item.path === "/dashboard"}
                   onClick={closeMobileMenu}
                   title={!showFullSidebar ? item.label : undefined}
                   className={({ isActive }) =>
@@ -254,36 +207,6 @@ const Sidebar = ({
 
         {/* BOTTOM SECTION */}
         <div className="sidebar-bottom">
-          <div className="sidebar-user">
-            <div className="user-avatar">
-              {user.name?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-
-            {showFullSidebar && (
-              <>
-                <div className="user-details">
-                  <span className="user-name">
-                    {user.name}
-                  </span>
-
-                  <span className="user-role">
-                    {user.role}
-                  </span>
-                </div>
-
-                <button
-                  className="user-settings-button"
-                  onClick={handleSettings}
-                  title="Settings"
-                  aria-label="Settings"
-                  type="button"
-                >
-                  <Settings size={17} />
-                </button>
-              </>
-            )}
-          </div>
-
           <button
             className="sidebar-logout-button"
             onClick={handleLogout}

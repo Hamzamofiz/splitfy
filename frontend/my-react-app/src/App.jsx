@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -19,104 +19,89 @@ import PaymentSetup from "./Manager/Payment/payment.jsx";
 import ExpenseManager from "./Manager/Expense/expense.jsx";
 import ManagerNavbar from "./Manager/Navbar/navbar.jsx";
 
-// Roommate Components
-import RoommateSidebar from "./Roommate/Sidebar/sidebar.jsx";
-import RoommateDashboard from "./Roommate/Dashboard/dashboard.jsx";
-import Expense from "./Roommate/Expense/expense.jsx";
-import Settlement from "./Roommate/Settlement/settlement.jsx";
-import IssueReporter from "./Roommate/IssueReporter/reporter.jsx";
-import Calculator from "./Roommate/Calculator/calculator.jsx";
-import RoommateNavbar from "./Roommate/Navbar/navbar.jsx";
+import { apiRequest, clearToken, getToken, setToken } from "./services/api.js";
 
 import "./App.css";
 
 function AppContent() {
-  const [userRole, setUserRole] = useState(null);
+  const [user, setUser] = useState(null);
+  const [sessionLoading, setSessionLoading] = useState(Boolean(getToken()));
+  const [sessionError, setSessionError] = useState("");
   const navigate = useNavigate();
 
-  // Login according to selected role
-  const handleLogin = (role) => {
-    setUserRole(role);
+  useEffect(() => {
+    if (!getToken()) return;
 
-    if (role === "manager") {
-      navigate("/dashboard", { replace: true });
-    } else if (role === "roommate") {
-      navigate("/roommate", { replace: true });
+    let active = true;
+    apiRequest("/auth/profile")
+      .then((profile) => {
+        if (!active) return;
+        if (profile.role !== "admin") {
+          clearToken();
+          setSessionError("This web portal is for Group Leaders and Managers. Sign in with an admin account.");
+          return;
+        }
+        setUser(profile);
+      })
+      .catch((error) => {
+        if (!active) return;
+        clearToken();
+        setSessionError(error.message || "Unable to restore your session.");
+      })
+      .finally(() => {
+        if (active) setSessionLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleLogin = (authenticatedUser, token) => {
+    if (authenticatedUser.role !== "admin") {
+      clearToken();
+      setSessionError("This web portal is for Group Leaders and Managers. Sign in with an admin account.");
+      return;
     }
+
+    setToken(token);
+    setUser(authenticatedUser);
+    setSessionError("");
+
+    navigate("/dashboard", { replace: true });
   };
 
-  // Logout
   const handleLogout = () => {
-    setUserRole(null);
+    clearToken();
+    setUser(null);
     navigate("/", { replace: true });
   };
 
-  // Home page
-  if (!userRole) {
-    return <Home onLogin={handleLogin} />;
+  if (sessionLoading) {
+    return <main className="session-loading">Loading your Splitfy account…</main>;
   }
 
-  // Manager Layout
-  if (userRole === "manager") {
-    return (
-      <div className="app-layout">
-
-        <ManagerSidebar onLogout={handleLogout} />
-
-        <main className="main-content">
-
-          {/* Only Manager Navbar */}
-          <ManagerNavbar />
-
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/bills" element={<UtilityBills />} />
-            <Route path="/members" element={<Members />} />
-            <Route path="/payment" element={<PaymentSetup />} />
-            <Route path="/expenses" element={<ExpenseManager />} />
-
-            <Route
-              path="*"
-              element={<Navigate to="/dashboard" replace />}
-            />
-          </Routes>
-
-        </main>
-      </div>
-    );
+  if (!user) {
+    return <Home onLogin={handleLogin} initialMessage={sessionError} />;
   }
 
-  // Roommate Layout
-  if (userRole === "roommate") {
-    return (
-      <div className="app-layout">
+  return (
+    <div className="app-layout">
+      <ManagerSidebar onLogout={handleLogout} user={user} />
 
-        <RoommateSidebar onLogout={handleLogout} />
-
-        <main className="main-content">
-
-          {/* Only Roommate Navbar */}
-          <RoommateNavbar />
-
-          <Routes>
-            <Route path="/roommate" element={<RoommateDashboard />} />
-            <Route path="/expense" element={<Expense />} />
-            <Route path="/settlement" element={<Settlement />} />
-            <Route path="/issue-reporter" element={<IssueReporter />} />
-            <Route path="/calculator" element={<Calculator />} />
-
-            <Route
-              path="*"
-              element={<Navigate to="/roommate" replace />}
-            />
-          </Routes>
-
-        </main>
-      </div>
-    );
-  }
-
-  return <Navigate to="/" replace />;
+      <main className="main-content">
+        <ManagerNavbar user={user} onUserUpdated={setUser} />
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard user={user} />} />
+          <Route path="/bills" element={<UtilityBills user={user} />} />
+          <Route path="/members" element={<Members user={user} />} />
+          <Route path="/payment" element={<PaymentSetup user={user} />} />
+          <Route path="/expenses" element={<ExpenseManager user={user} />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
 function App() {
