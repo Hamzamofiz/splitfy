@@ -20,6 +20,21 @@ const moneyPkr = (amount) =>
 const formatDate = (date) =>
   date ? new Date(date).toLocaleDateString("en-PK") : "Date unavailable";
 
+const getBillStatus = (bill) => {
+  if (typeof bill.status === "string" && bill.status.trim()) {
+    return bill.status.trim();
+  }
+
+  const assignments = Array.isArray(bill.assignedTo) ? bill.assignedTo : [];
+  if (assignments.length && assignments.every((assignment) => assignment.isPaid)) {
+    return "Paid";
+  }
+  if (assignments.some((assignment) => assignment.isPaid)) {
+    return "Partially Paid";
+  }
+  return "Pending";
+};
+
 export default function Dashboard({ user }) {
   const { room, loading: roomLoading, error: roomError, refresh } =
     useRoomData(user?._id);
@@ -63,9 +78,8 @@ export default function Dashboard({ user }) {
   const error =
     roomError || billsError || expensesError || settlementsError || maintenanceError || actionError;
   const upcomingBills = bills
-    .filter((bill) => bill.status !== "Paid")
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-    .slice(0, 3);
+    .filter((bill) => getBillStatus(bill).toLowerCase() !== "paid")
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
   const recentActivity = [
     ...expenses.map((expense) => ({
       id: `expense-${expense._id}`,
@@ -174,7 +188,7 @@ export default function Dashboard({ user }) {
           <section className="dashboard-activity-grid" aria-label="Room updates">
             <article className="dashboard-activity-card">
               <div className="dashboard-activity-card__heading">
-                <h2>Upcoming bills</h2>
+                <h2>Active bills</h2>
                 <span>Due soon</span>
               </div>
               {upcomingBills.length ? (
@@ -184,8 +198,8 @@ export default function Dashboard({ user }) {
                       <div className="dashboard-activity-item__details">
                         <strong>{bill.title}</strong>
                         <span>
-                          <span className={`dashboard-activity-status${bill.status === "Partially Paid" ? " is-partial" : ""}`}>
-                            {bill.status}
+                          <span className={`dashboard-activity-status${getBillStatus(bill).toLowerCase() === "partially paid" ? " is-partial" : ""}`}>
+                            {getBillStatus(bill)}
                           </span>
                           <span>Due {formatDate(bill.dueDate)}</span>
                         </span>
@@ -196,7 +210,7 @@ export default function Dashboard({ user }) {
                 </ul>
               ) : (
                 <p className="dashboard-activity-empty">
-                  {billsLoading ? "Loading bills…" : "No pending bills."}
+                  {billsLoading ? "Loading bills…" : "No active bills."}
                 </p>
               )}
             </article>

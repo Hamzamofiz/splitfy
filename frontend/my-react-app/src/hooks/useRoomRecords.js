@@ -18,7 +18,12 @@ export default function useRoomRecords(endpoint, responseKey) {
     setError("");
     try {
       const response = await apiRequest(endpoint);
-      setRecords(response[responseKey]);
+      const responseRecords =
+        response?.[responseKey] ?? response?.data?.[responseKey];
+      if (!Array.isArray(responseRecords)) {
+        throw new Error(`The server returned an invalid ${responseKey} response.`);
+      }
+      setRecords(responseRecords);
     } catch (requestError) {
       setError(requestError.message || "Unable to load room data.");
     } finally {

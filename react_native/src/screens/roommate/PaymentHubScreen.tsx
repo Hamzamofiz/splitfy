@@ -133,8 +133,8 @@ export default function PaymentHubScreen({ navigation }: Props) {
               <Text style={[styles.filterText, channel === item && styles.filterTextSelected]}>{item}</Text>
             </TouchableOpacity>
           ))}</View>
-          <TextInput testID="settlement-amount" style={styles.input} value={amount} onChangeText={setAmount} placeholder="Amount (PKR)" keyboardType="numeric" />
-          <TextInput testID="settlement-note" style={styles.input} value={note} onChangeText={setNote} placeholder="Note (optional)" />
+          <TextInput testID="settlement-amount" style={styles.input} value={amount} onChangeText={setAmount} placeholder="Amount (PKR)" placeholderTextColor={Colors.textSub} keyboardType="numeric" />
+          <TextInput testID="settlement-note" style={styles.input} value={note} onChangeText={setNote} placeholder="Note (optional)" placeholderTextColor={Colors.textSub} />
           <TouchableOpacity testID="settlement-submit" style={styles.confirmButton} disabled={savingId === 'new'} onPress={recordSettlement}><Text style={styles.confirmText}>{savingId === 'new' ? 'Saving…' : 'Save settlement'}</Text></TouchableOpacity>
         </View>
         <Text style={styles.section}>Group payment details</Text>

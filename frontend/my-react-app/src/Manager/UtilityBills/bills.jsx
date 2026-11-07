@@ -1,15 +1,31 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ApiPage from "../../components/ApiPage";
 import useRoomData from "../../hooks/useRoomData";
 import useRoomRecords from "../../hooks/useRoomRecords";
 import { apiRequest } from "../../services/api";
 
 const billTypes = ["Rent", "Electricity", "Water", "Gas", "Maintenance", "Internet", "other"];
+const maxReceiptSize = 5 * 1024 * 1024;
 const money = (amount) =>
   `Rs ${Number(amount || 0).toLocaleString("en-PK", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
+
+const readImageAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Unable to read the selected receipt image."));
+      }
+    };
+    reader.onerror = () =>
+      reject(reader.error || new Error("Unable to read the selected receipt image."));
+    reader.readAsDataURL(file);
+  });
 
 export default function UtilityBills({ user }) {
   const { room, loading: roomLoading, error: roomError } = useRoomData(user?._id);
@@ -26,6 +42,29 @@ export default function UtilityBills({ user }) {
   const [actionError, setActionError] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [receiptImage, setReceiptImage] = useState(null);
+  const receiptInputRef = useRef(null);
+
+  const selectReceiptImage = (event) => {
+    const file = event.target.files?.[0] || null;
+    setActionError("");
+
+    if (file && !file.type.startsWith("image/")) {
+      setReceiptImage(null);
+      event.target.value = "";
+      setActionError("Choose an image file for the receipt.");
+      return;
+    }
+
+    if (file && file.size > maxReceiptSize) {
+      setReceiptImage(null);
+      event.target.value = "";
+      setActionError("Receipt images must be 5 MB or smaller.");
+      return;
+    }
+
+    setReceiptImage(file);
+  };
 
   const createBill = async (event) => {
     event.preventDefault();
@@ -47,6 +86,9 @@ export default function UtilityBills({ user }) {
     }));
 
     try {
+      const meterPhotoUrl = receiptImage
+        ? await readImageAsDataUrl(receiptImage)
+        : null;
       await apiRequest("/bills", {
         method: "POST",
         body: {
@@ -54,9 +96,12 @@ export default function UtilityBills({ user }) {
           totalAmount: Number(form.totalAmount),
           roomId: room._id,
           assignedTo,
+          meterPhotoUrl,
         },
       });
       setForm({ ...form, title: "", totalAmount: "" });
+      setReceiptImage(null);
+      if (receiptInputRef.current) receiptInputRef.current.value = "";
       setMessage("Bill created and assigned to all room members.");
       await refresh();
     } catch (requestError) {
@@ -118,6 +163,15 @@ export default function UtilityBills({ user }) {
                 <select value={form.billType} onChange={(event) => setForm({ ...form, billType: event.target.value })}>
                   {billTypes.map((type) => <option key={type}>{type}</option>)}
                 </select>
+              </label>
+              <label>
+                Receipt image (optional, max 5 MB)
+                <input
+                  ref={receiptInputRef}
+                  accept="image/*"
+                  onChange={selectReceiptImage}
+                  type="file"
+                />
               </label>
               <p className="api-muted">The amount is split evenly across {room.members?.length || 0} room members.</p>
               <button className="api-button" disabled={saving} type="submit">{saving ? "Saving…" : "Create bill"}</button>
